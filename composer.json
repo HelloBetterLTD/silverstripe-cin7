@@ -2,7 +2,7 @@
     "name": "silverstripers/cin7",
     "description": "Integrate Cin7 with Silverstripe CMS & Silvershop",
     "type": "silverstripe-vendormodule",
-    "keywords": ["silverstripe", "cin7", "ecommerce", "silvershop" "module"],
+    "keywords": ["silverstripe", "cin7", "ecommerce", "silvershop", "module"],
     "license": "BSD-3-Clause",
     "authors": [
     {
