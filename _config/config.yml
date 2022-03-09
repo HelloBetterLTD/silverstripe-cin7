@@ -1,0 +1,10 @@
+---
+name: cin7_configs
+---
+SilverStripe\SiteConfig\SiteConfig:
+  extensions:
+    - SilverStripers\Cin7\Extension\Config
+
+SilverShop\Page\Product:
+  extensions:
+    - SilverStripers\Cin7\Extension\ProductExtension
