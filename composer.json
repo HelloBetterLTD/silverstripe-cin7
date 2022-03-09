@@ -12,7 +12,8 @@
     "require": {
         "silverstripe/framework": "^4.10",
         "silverstripe/cms": "^4.10",
-        "silvershop/core": "^3.0"
+        "silvershop/core": "^3.0",
+        "tractorcow/silverstripe-autocomplete": "4.0.0"
     },
     "extra": {
         "expose": [
