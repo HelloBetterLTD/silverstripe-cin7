@@ -3,6 +3,7 @@
 namespace SilverStripers\Cin7\Model;
 
 use SilverStripe\ORM\DataObject;
+use TractorCow\AutoComplete\AutoCompleteField;
 
 class ProductCategory extends DataObject
 {
@@ -21,6 +22,12 @@ class ProductCategory extends DataObject
         'Parent' => ProductCategory::class
     ];
 
+    private static $summary_fields = [
+        'Title',
+        'Parent.Title' => ['title' => 'Parent'],
+        'ProductCategory.Title' => ['title' => 'Shop Category']
+    ];
+
     private static $table_name = 'Cin7_ProductCategory';
 
     public function getCMSFields()
@@ -29,23 +36,34 @@ class ProductCategory extends DataObject
         $fields->removeByName([
             'ParentID',
             'ProductCategory',
+            'ExternalID',
             'Hash',
             'Sort'
         ]);
-//        $fields->addFieldsToTab('Root.Main', [
-//            AutoCompl
-//        ])
+        $fields->addFieldsToTab('Root.Main', [
+            AutoCompleteField::create('ParentID', 'Parent category')
+                ->setSourceFields(['Title'])
+                ->setSourceClass(ProductCategory::class),
+            AutoCompleteField::create('ProductCategoryID', 'Shop Product Category')
+                ->setSourceFields(['Title'])
+                ->setSourceClass(\SilverShop\Page\ProductCategory::class),
+        ], 'Description');
         return $fields;
     }
 
-    public function canEdit($member = null)
+    public function canCreate($member = null, $context = [])
     {
-        return true;
+        return false;
     }
 
     public function canDelete($member = null)
     {
         return false;
+    }
+
+    public function canEdit($member = null)
+    {
+        return true;
     }
 
     public function canView($member = null)

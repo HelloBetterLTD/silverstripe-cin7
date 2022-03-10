@@ -26,10 +26,6 @@ class ImportProducts extends BuildTask
         foreach ($products as $product) {
             $loader->load($product);
         }
-        echo '<pre>' . print_r($products, 1) . '</pre>';
-        die();
-
-
     }
 
 }

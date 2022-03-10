@@ -8,6 +8,7 @@ use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataExtension;
+use SilverStripers\Cin7\Model\PriceOption;
 use SilverStripers\Cin7\Model\ProductCategory;
 
 class Config extends DataExtension
@@ -37,7 +38,13 @@ class Config extends DataExtension
         $fields->addFieldsToTab('Root.Cin7.Categories', [
             GridField::create('Cin7Categories', 'Categories')
                 ->setList(ProductCategory::get())
-                ->setConfig(GridFieldConfig_RecordEditor::create())
+                ->setConfig(GridFieldConfig_RecordEditor::create(50))
+        ]);
+
+        $fields->addFieldsToTab('Root.Cin7.PricingOptions', [
+            GridField::create('Cin7Pricing', 'Pricing Options')
+                ->setList(PriceOption::get())
+                ->setConfig(GridFieldConfig_RecordEditor::create(50))
         ]);
     }
 

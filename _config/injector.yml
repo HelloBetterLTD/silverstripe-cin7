@@ -1,0 +1,5 @@
+#SilverStripe\Core\Injector\Injector:
+#  SilverShop\Model\Variation\AttributeType:
+#    class: SilverStripers\Cin7\Model\AttributeType
+#  SilverShop\Model\Variation\Variation:
+#    class: SilverStripers\Cin7\Model\Variation
