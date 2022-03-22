@@ -4,6 +4,7 @@ namespace SilverStripers\Cin7\Connector\Loader;
 
 use SilverShop\Model\Variation\Variation;
 use SilverShop\Page\Product;
+use SilverStripe\View\Parsers\URLSegmentFilter;
 use SilverStripers\Cin7\Extension\AttributeTypeExtension;
 use SilverStripers\Cin7\Model\Price;
 use SilverStripers\Cin7\Model\PriceOption;
@@ -41,10 +42,10 @@ class ProductLoader extends Loader
         $product = Product::create([
             'ExternalID' => $data['id'],
             'Model' => $data['styleCode'],
-            'Content' => $data['description']
+            'Content' => $data['description'],
+            'URLSegment' => URLSegmentFilter::create()->filter($data['name'])
         ]);
         $product->write();
-
         // load product images only for new pages
         foreach ($data['images'] as $image) {
             if ($image['link'] && ($file = ImageLoader::load($image['link'])) && $file->exists()) {
@@ -55,7 +56,6 @@ class ProductLoader extends Loader
                 $product->Images()->add($file->ID);
             }
         }
-
         return $product;
     }
 
@@ -90,14 +90,10 @@ class ProductLoader extends Loader
             if (!$product) {
                 $product = $this->createNewProduct($data);
             }
-
             if ($product->ExternalHash != $this->getHash($data)) {
-
                 $this->assignCategoriesToProduct($data, $product);
                 $this->importBasicData($data, $product);
-
                 $this->processVariations($data, $product);
-
                 $product->ExternalHash = $this->getHash($data);
                 $product->write();
                 if ($product->isPublished()) { // publish only previously published products
@@ -124,19 +120,16 @@ class ProductLoader extends Loader
     private function processVariations($data, Product $product)
     {
         $variatonIDs = $product->Variations()->map('ID', 'ID')->toArray();
-
         if ($data['productOptions']) {
             $sizeType = AttributeTypeExtension::get_size_type();
             $product->VariationAttributeTypes()->add($sizeType);
         }
-
         foreach ($data['productOptions'] as $optionData) {
             $variation = $this->importVariation($optionData, $product);
             if ($variation) {
                 unset($variatonIDs[$variation->ID]);
             }
         }
-
         foreach ($variatonIDs as $id) {
             /* @var $variation Variation */
             if ($variation = Variation::get()->byID($id)) {
@@ -152,7 +145,6 @@ class ProductLoader extends Loader
         if (!$variation) {
             $variation = $this->createVariation($data, $product);
         }
-
         $variation->update([
             'Title' => !empty($data['option1']) ? $data['option1'] : '',
             'InternalItemID' => $data['code'],
@@ -172,7 +164,6 @@ class ProductLoader extends Loader
             $variation->AttributeValues()
                 ->add(AttributeTypeExtension::find_or_make_color_attribute($data['option1']));
         }
-
         foreach (PriceOption::get() as $option) {
             if (!empty($data[$option->Label])) {
                 $price = Price::get()->filter([
@@ -224,7 +215,5 @@ class ProductLoader extends Loader
         $variation->write();
         return $variation;
     }
-
-
 
 }

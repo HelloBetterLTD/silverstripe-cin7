@@ -2,6 +2,7 @@
 
 namespace SilverStripers\Cin7\Connector\Loader;
 
+use SilverStripe\View\Parsers\URLSegmentFilter;
 use SilverStripers\Cin7\Model\ProductCategory;
 
 class ProductCategoryLoader extends Loader
@@ -19,9 +20,10 @@ class ProductCategoryLoader extends Loader
             $category = ProductCategory::create([
                 'ExternalID' => $data['id'],
                 'ParentID' => $parent ? $parent->ID : 0,
+                'URLSegment' => URLSegmentFilter::create()->filter($data['name'])
             ]);
         }
-        if ($category->Hash == $hash) {
+        if ($category->Hash != $hash) {
             $category->update([
                 'Title' => $data['name'],
                 'IsActive' => $data['isActive'],
