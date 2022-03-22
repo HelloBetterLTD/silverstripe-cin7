@@ -76,7 +76,7 @@ class Cin7Connector
     {
         $config = SiteConfig::current_site_config();
         $response = $this->get(self::PRODUCTS_ENDPOINT, [
-            'rows' => 50,
+            'rows' => 10,
             'page' => $config->CurrentProductPage ?: 1
         ]);
         if (empty($response)) {

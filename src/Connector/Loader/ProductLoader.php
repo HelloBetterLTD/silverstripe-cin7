@@ -77,7 +77,7 @@ class ProductLoader extends Loader
         $ids = $data['categoryIdArray'];
         $categories = ProductCategory::get()
             ->filter('ExternalID', $ids)
-            ->where('ProductCategoryID IS NOT NULL');
+            ->where('ProductCategoryID > 0');
         return $categories->count() > 0;
     }
 
@@ -90,7 +90,7 @@ class ProductLoader extends Loader
             if (!$product) {
                 $product = $this->createNewProduct($data);
             }
-            if ($product->ExternalHash != $this->getHash($data)) {
+            if (1 || $product->ExternalHash != $this->getHash($data)) {
                 $this->assignCategoriesToProduct($data, $product);
                 $this->importBasicData($data, $product);
                 $this->processVariations($data, $product);
