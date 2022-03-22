@@ -2,6 +2,7 @@
 
 namespace SilverStripers\Cin7\Model;
 
+use SilverStripe\Forms\TreeDropdownField;
 use SilverStripe\ORM\DataObject;
 use TractorCow\AutoComplete\AutoCompleteField;
 
@@ -44,9 +45,11 @@ class ProductCategory extends DataObject
             AutoCompleteField::create('ParentID', 'Parent category')
                 ->setSourceFields(['Title'])
                 ->setSourceClass(ProductCategory::class),
-            AutoCompleteField::create('ProductCategoryID', 'Shop Product Category')
-                ->setSourceFields(['Title'])
-                ->setSourceClass(\SilverShop\Page\ProductCategory::class),
+            TreeDropdownField::create(
+                'ProductCategoryID',
+                'Shop Product Category',
+                \SilverShop\Page\ProductCategory::class
+            )
         ], 'Description');
         return $fields;
     }
