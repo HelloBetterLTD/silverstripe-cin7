@@ -90,7 +90,7 @@ class ProductLoader extends Loader
             if (!$product) {
                 $product = $this->createNewProduct($data);
             }
-            if (1 || $product->ExternalHash != $this->getHash($data)) {
+            if ($product->ExternalHash != $this->getHash($data)) {
                 $this->assignCategoriesToProduct($data, $product);
                 $this->importBasicData($data, $product);
                 $this->processVariations($data, $product);
