@@ -2,7 +2,10 @@
 
 namespace SilverStripers\Cin7\Model;
 
+use SilverStripe\Forms\CheckboxSetField;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\Security\Group;
 
 class PriceOption extends DataObject
 {
@@ -11,6 +14,10 @@ class PriceOption extends DataObject
         'Label' => 'Varchar',
         'MinQuantity' => 'Int',
         'MaxQuantity' => 'Int',
+    ];
+
+    private static $many_many = [
+        'Groups' => Group::class
     ];
 
     private static $table_name = 'Cin7_PriceOption';
@@ -22,6 +29,18 @@ class PriceOption extends DataObject
         'MinQuantity',
         'MaxQuantity'
     ];
+
+    public function getCMSFields() : FieldList
+    {
+        $fields = parent::getCMSFields();
+        $fields->removeByName('Groups');
+        $fields->addFieldToTab(
+            'Root.Main',
+            CheckboxSetField::create('Groups')
+                ->setSource(Group::get()->sort('Title')->map()->toArray())
+        );
+        return $fields;
+    }
 
     public function requireDefaultRecords()
     {

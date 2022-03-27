@@ -9,6 +9,10 @@ SilverShop\Page\Product:
   extensions:
     - SilverStripers\Cin7\Extension\ProductExtension
 
+SilverShop\Page\OrderItem:
+  extensions:
+    - SilverStripers\Cin7\Extension\OrderItemExtension
+
 SilverShop\Model\Variation\Variation:
   extensions:
     - SilverStripers\Cin7\Extension\VariationExtension

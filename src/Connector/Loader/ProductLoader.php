@@ -13,6 +13,8 @@ use SilverStripers\Cin7\Model\ProductCategory;
 class ProductLoader extends Loader
 {
 
+    private $isNew = true;
+
     private function findProduct($data)
     {
         return Product::get()->find('ExternalID', $data['id']);
@@ -47,13 +49,15 @@ class ProductLoader extends Loader
         ]);
         $product->write();
         // load product images only for new pages
-        foreach ($data['images'] as $image) {
-            if ($image['link'] && ($file = ImageLoader::load($image['link'])) && $file->exists()) {
-                if (!$product->ImageID) {
-                    $product->ImageID = $file->ID;
-                    $product->write();
+        if ($this->isNew) {
+            foreach ($data['images'] as $image) {
+                if ($image['link'] && ($file = ImageLoader::load($image['link'])) && $file->exists()) {
+                    if (!$product->ImageID) {
+                        $product->ImageID = $file->ID;
+                        $product->write();
+                    }
+                    $product->Images()->add($file->ID);
                 }
-                $product->Images()->add($file->ID);
             }
         }
         return $product;
@@ -87,7 +91,9 @@ class ProductLoader extends Loader
         if ($this->canImportProduct($data)) {
             /* @var $product Product */
             $product = $this->findProduct($data);
+            $this->isNew = false;
             if (!$product) {
+                $this->isNew = true;
                 $product = $this->createNewProduct($data);
             }
             if ($product->ExternalHash != $this->getHash($data)) {
@@ -152,6 +158,8 @@ class ProductLoader extends Loader
             'WholesalePrice' => $data['wholesalePrice'],
             'VipPrice' => $data['vipPrice'],
             'SpecialPrice' => $data['specialPrice'],
+            'StockAvailable' => $data['stockAvailable'],
+            'StockOnHand' => $data['stockOnHand'],
         ]);
         $variation->write();
 
@@ -207,9 +215,11 @@ class ProductLoader extends Loader
             'ProductID' => $product->ID,
             'ExternalID' => $this->getVariationID($data)
         ]);
-        if (!empty($data['image']) && !empty($data['image']['link'])) {
-            if($image = ImageLoader::load($data['image']['link'])) {
-                $variation->ImageID = $image->ID;
+        if ($this->isNew) { // only import images to new
+            if (!empty($data['image']) && !empty($data['image']['link'])) {
+                if ($image = ImageLoader::load($data['image']['link'])) {
+                    $variation->ImageID = $image->ID;
+                }
             }
         }
         $variation->write();

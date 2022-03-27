@@ -6,6 +6,8 @@ use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\Image;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataExtension;
+use SilverStripers\Cin7\Form\Field\PricingOptionsField;
+use SilverStripers\Cin7\Model\Price;
 
 class ProductExtension extends DataExtension
 {
@@ -14,6 +16,10 @@ class ProductExtension extends DataExtension
         'ExternalHash' => 'Varchar',
         'ExternalID' => 'Int',
         'Brand' => 'Varchar'
+    ];
+
+    private static $has_many = [
+        'Prices' => Price::class
     ];
 
     private static $many_many = [
@@ -26,9 +32,22 @@ class ProductExtension extends DataExtension
         ]
     ];
 
-    public function updateCMSFields(FieldList $fields)
+    public function updateCMSFields(FieldList $fields) : void
     {
+        $product = $this->owner;
+        $fields->removeByName([
+            'Prices'
+        ]);
         $fields->addFieldToTab('Root.Images', UploadField::create('Images'));
+
+        if (!$product->Variations()->count()) {
+            $fields->addFieldToTab(
+                'Root.Pricing',
+                PricingOptionsField::create('PricingOptions', 'Prices')
+                    ->setBuyable($this->owner)
+            );
+        }
+
     }
 
 }
