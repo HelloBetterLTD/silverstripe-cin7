@@ -8,6 +8,7 @@ use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataExtension;
+use SilverStripers\Cin7\Model\Branch;
 use SilverStripers\Cin7\Model\PriceOption;
 use SilverStripers\Cin7\Model\ProductCategory;
 
@@ -21,7 +22,8 @@ class Config extends DataExtension
         'DevAPIUsername' => 'Varchar',
         'DevAPIConnectionKey' => 'Varchar',
 
-        'CurrentProductPage' => 'Int'
+        'CurrentProductPage' => 'Int',
+        'CurrentStockPage' => 'Int'
     ];
 
     public function updateCMSFields(FieldList $fields)
@@ -44,6 +46,12 @@ class Config extends DataExtension
         $fields->addFieldsToTab('Root.Cin7.PricingOptions', [
             GridField::create('Cin7Pricing', 'Pricing Options')
                 ->setList(PriceOption::get())
+                ->setConfig(GridFieldConfig_RecordEditor::create(50))
+        ]);
+
+        $fields->addFieldsToTab('Root.Cin7.Branches', [
+            GridField::create('Branches', 'Branches')
+                ->setList(Branch::get())
                 ->setConfig(GridFieldConfig_RecordEditor::create(50))
         ]);
     }

@@ -13,6 +13,7 @@ class VariationExtension extends DataExtension
     private static $db = [
         'Title' => 'Varchar',
         'ExternalID' => 'Varchar',
+        'Barcode' => 'Varchar',
         'WholesalePrice' => 'Currency(19,4)',
         'VipPrice' => 'Currency(19,4)',
         'SpecialPrice' => 'Currency(19,4)',

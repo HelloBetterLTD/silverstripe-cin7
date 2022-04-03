@@ -155,6 +155,7 @@ class ProductLoader extends Loader
             'Title' => !empty($data['option1']) ? $data['option1'] : '',
             'InternalItemID' => $data['code'],
             'Price' => $data['retailPrice'],
+            'Barcode' => $data['barcode'],
             'WholesalePrice' => $data['wholesalePrice'],
             'VipPrice' => $data['vipPrice'],
             'SpecialPrice' => $data['specialPrice'],

@@ -19,6 +19,8 @@ class Cin7Connector
 
     const PRODUCT_CATEGORIES_ENDPOINT = 'v1/ProductCategories';
     const PRODUCTS_ENDPOINT = 'v1/Products';
+    const BRANCHES_ENDPOINT = 'v1/Branches';
+    const STOCK_ENDPOINT = 'v1/Stock';
 
     private static $conn;
 
@@ -88,6 +90,18 @@ class Cin7Connector
         return $response;
     }
 
+    public function getBranches() : array
+    {
+        $config = SiteConfig::current_site_config();
+        $response = $this->get(self::BRANCHES_ENDPOINT, [
+            'rows' => 100,
+            'page' => 1
+        ]);
+        return $response;
+    }
+
+
+
     public function get($path, $data = null) : array
     {
         $params = null;
@@ -96,9 +110,48 @@ class Cin7Connector
                 'query' => $data
             ];
         }
-        $response = $this->getClient()->get($path, $params);
-        $json = $response->getBody()->getContents();
-        return json_decode($json, true);
+        try {
+            $response = $this->getClient()->get($path, $params);
+            $json = $response->getBody()->getContents();
+            return json_decode($json, true);
+        } catch (\Exception $e) {}
+        return [];
+    }
+
+    public function getStockForProduct($sku) : array
+    {
+        return $this->get(self::STOCK_ENDPOINT, [
+            'where' => [
+                'code' => "'$sku'"
+            ]
+        ]);
+    }
+
+    public function getStockForBranch($sku, $branchId) : int
+    {
+        $stocks = $this->getStockForProduct($sku);
+        foreach ($stocks as $stock) {
+            if ($stock['branchId'] == $branchId) {
+                return $stock['stockOnHand'];
+            }
+        }
+        return 0;
+    }
+
+    public function getStocks()
+    {
+        $config = SiteConfig::current_site_config();
+        $response = $this->get(self::STOCK_ENDPOINT, [
+            'rows' => 250,
+            'page' => $config->CurrentStockPage ?: 1
+        ]);
+        if (empty($response)) {
+            $config->CurrentStockPage = 1;
+        } else {
+            $config->CurrentStockPage += 1;
+        }
+        $config->write();
+        return $response;
     }
 
 }
