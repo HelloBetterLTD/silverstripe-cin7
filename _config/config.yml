@@ -9,9 +9,21 @@ SilverShop\Page\Product:
   extensions:
     - SilverStripers\Cin7\Extension\ProductExtension
 
-SilverShop\Page\OrderItem:
+SilverShop\Model\OrderItem:
   extensions:
     - SilverStripers\Cin7\Extension\OrderItemExtension
+
+SilverShop\Model\Order:
+  extensions:
+    - SilverStripers\Cin7\Extension\OrderExtension
+
+SilverStripe\Security\Member:
+  extensions:
+    - SilverStripers\Cin7\Extension\MemberExtension
+
+SilverStripe\ORM\FieldType\DBDatetime:
+  extensions:
+    - SilverStripers\Cin7\Extension\DatetimeExtension
 
 SilverShop\Model\Variation\Variation:
   extensions:

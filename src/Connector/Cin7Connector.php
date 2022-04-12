@@ -3,6 +3,7 @@
 namespace SilverStripers\Cin7\Connector;
 
 use GuzzleHttp\Client;
+use SilverShop\Model\Order;
 use SilverStripe\CMS\Controllers\ContentController;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Configurable;
@@ -21,6 +22,7 @@ class Cin7Connector
     const PRODUCTS_ENDPOINT = 'v1/Products';
     const BRANCHES_ENDPOINT = 'v1/Branches';
     const STOCK_ENDPOINT = 'v1/Stock';
+    const POST_ORDER = 'v1/SalesOrders';
 
     private static $conn;
 
@@ -100,8 +102,6 @@ class Cin7Connector
         return $response;
     }
 
-
-
     public function get($path, $data = null) : array
     {
         $params = null;
@@ -112,6 +112,35 @@ class Cin7Connector
         }
         try {
             $response = $this->getClient()->get($path, $params);
+            $json = $response->getBody()->getContents();
+            return json_decode($json, true);
+        } catch (\Exception $e) {}
+        return [];
+    }
+
+    public function post($path, $json) : array
+    {
+        try {
+            $response = $this->getClient()->request('POST', $path, [
+                'body' => $json,
+                'headers' => [
+                    'Content-type' => 'application/json'
+                ]
+            ]);
+            $json = $response->getBody()->getContents();
+            return json_decode($json, true);
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
+        return [];
+    }
+
+    public function put($path, $json) : array
+    {
+        try {
+            $response = $this->getClient()->request('PUT', $path, [
+                'body' => $json
+            ]);
             $json = $response->getBody()->getContents();
             return json_decode($json, true);
         } catch (\Exception $e) {}
@@ -152,6 +181,20 @@ class Cin7Connector
         }
         $config->write();
         return $response;
+    }
+
+    public function syncOrder(Order $order)
+    {
+        $data = $order->toCin7();
+        if (!$order->ExternalID) {
+            $response = $this->post(self::POST_ORDER, json_encode([$data]));
+            if ($response) {
+                $order->ExternalID = $response[0]['id'];
+                $order->write();
+            }
+        } else {
+            return $this->put(self::POST_ORDER, json_encode([$data]));
+        }
     }
 
 }
