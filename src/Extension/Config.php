@@ -2,6 +2,7 @@
 
 namespace SilverStripers\Cin7\Extension;
 
+use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
@@ -23,12 +24,15 @@ class Config extends DataExtension
         'DevAPIConnectionKey' => 'Varchar',
 
         'CurrentProductPage' => 'Int',
-        'CurrentStockPage' => 'Int'
+        'CurrentStockPage' => 'Int',
+
+        'SyncOrdersToAPI' => 'Boolean'
     ];
 
     public function updateCMSFields(FieldList $fields)
     {
         $fields->addFieldsToTab('Root.Cin7.Main', [
+            CheckboxField::create('SyncOrdersToAPI', 'Sync Orders to Cin7 API?'),
             HeaderField::create('Cin7DevAPI', 'Dev api credentials')->setHeadingLevel(3),
             TextField::create('DevAPIUsername', 'API Username'),
             TextField::create('DevAPIConnectionKey', 'API Username'),

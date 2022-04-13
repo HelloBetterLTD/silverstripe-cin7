@@ -17,7 +17,7 @@ class OrderItemExtension extends DataExtension
         if (get_class($owner) === OrderItem::class) {
             $buyable = $owner->Product();
         } else {
-            $buyable = $owner->Variation();
+            $buyable = $owner->ProductVariation();
         }
 
         $priceOptions = PriceOption::get();
@@ -49,7 +49,7 @@ class OrderItemExtension extends DataExtension
             $priceList = $buyable
                 ->Prices()
                 ->sort('Price')
-                ->filter('PriceOption', $priceOptions->column('ID'));
+                ->filter('PriceOption.ID', $priceOptions->column('ID'));
 
             $quantity = $owner->Quantity;
             foreach ($priceList as $priceItem) {
