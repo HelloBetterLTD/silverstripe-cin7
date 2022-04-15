@@ -23,8 +23,7 @@ class OrderExtension extends DataExtension
 
     public function onStatusChange()
     {
-        $this->owner->ForceCin7Sync = 1;
-        $this->owner->write();
+        $this->owner->ForceCin7Sync = 1; // update Cin7 for any status changes
     }
 
     public function getProductTotal()
