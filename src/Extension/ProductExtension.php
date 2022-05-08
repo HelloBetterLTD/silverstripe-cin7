@@ -52,4 +52,16 @@ class ProductExtension extends DataExtension
 
     }
 
+    public function getCustomField($fieldName)
+    {
+        $product = $this->owner;
+        if ($product->CustomFields) {
+            $data = json_encode($product->CustomFields, true);
+            if (!empty($data[$fieldName])) {
+                return $data[$fieldName];
+            }
+        }
+        return null;
+    }
+
 }

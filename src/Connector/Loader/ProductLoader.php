@@ -230,17 +230,4 @@ class ProductLoader extends Loader
         $variation->write();
         return $variation;
     }
-
-    public function getCustomField($fieldName)
-    {
-        $product = $this->owner;
-        if ($product->CustomFields) {
-            $data = json_encode($product->CustomFields, true);
-            if (!empty($data[$fieldName])) {
-                return $data[$fieldName];
-            }
-        }
-        return null;
-    }
-
 }
