@@ -121,6 +121,8 @@ class ProductLoader extends Loader
             'Width' => $data['width'],
             'Depth' => $data['length'],
             'Brand' => $data['brand'],
+            'StyleCode' => $data['styleCode'],
+            'CustomFields' => json_encode(!empty($data['customFields']) ? $data['customFields'] : []),
         ]);
         $product->write();
     }
