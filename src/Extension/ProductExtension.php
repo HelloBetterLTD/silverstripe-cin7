@@ -56,7 +56,7 @@ class ProductExtension extends DataExtension
     {
         $product = $this->owner;
         if ($product->CustomFields) {
-            $data = json_encode($product->CustomFields, true);
+            $data = json_decode($product->CustomFields, true);
             if (!empty($data[$fieldName])) {
                 return $data[$fieldName];
             }
