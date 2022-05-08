@@ -45,6 +45,8 @@ class ProductLoader extends Loader
             'ExternalID' => $data['id'],
             'Model' => $data['styleCode'],
             'Content' => $data['description'],
+            'StyleCode' => $data['styleCode'],
+            'CustomFields' => json_encode(!empty($data['customFields']) ? $data['customFields'] : []),
             'URLSegment' => URLSegmentFilter::create()->filter($data['name'])
         ]);
         $product->write();
@@ -225,6 +227,18 @@ class ProductLoader extends Loader
         }
         $variation->write();
         return $variation;
+    }
+
+    public function getCustomField($fieldName)
+    {
+        $product = $this->owner;
+        if ($product->CustomFields) {
+            $data = json_encode($product->CustomFields, true);
+            if (!empty($data[$fieldName])) {
+                return $data[$fieldName];
+            }
+        }
+        return null;
     }
 
 }

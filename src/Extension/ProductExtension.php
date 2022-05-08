@@ -15,7 +15,9 @@ class ProductExtension extends DataExtension
     private static $db = [
         'ExternalHash' => 'Varchar',
         'ExternalID' => 'Int',
-        'Brand' => 'Varchar'
+        'Brand' => 'Varchar',
+        'StyleCode' => 'Varchar',
+        'CustomFields' => 'Text' // JSON
     ];
 
     private static $has_many = [
