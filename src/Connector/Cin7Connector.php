@@ -92,6 +92,13 @@ class Cin7Connector
         return $response;
     }
 
+    public function getProductData($id)
+    {
+        $response = $this->get(self::PRODUCTS_ENDPOINT . '/' . $id, []);
+        return $response;
+    }
+
+
     public function getBranches() : array
     {
         $config = SiteConfig::current_site_config();
@@ -104,7 +111,7 @@ class Cin7Connector
 
     public function get($path, $data = null) : array
     {
-        $params = null;
+        $params = [];
         if ($data) {
             $params = [
                 'query' => $data

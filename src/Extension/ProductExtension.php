@@ -5,7 +5,10 @@ namespace SilverStripers\Cin7\Extension;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\Image;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\FormAction;
 use SilverStripe\ORM\DataExtension;
+use SilverStripers\Cin7\Connector\Cin7Connector;
+use SilverStripers\Cin7\Connector\Loader\ProductLoader;
 use SilverStripers\Cin7\Form\Field\PricingOptionsField;
 use SilverStripers\Cin7\Model\Price;
 
@@ -62,6 +65,18 @@ class ProductExtension extends DataExtension
             }
         }
         return null;
+    }
+
+    public function syncWithCin7()
+    {
+        $data = Cin7Connector::init()->getProductData($this->owner->ExternalID);
+        $loader = ProductLoader::create();
+        $loader->load($data, true);
+    }
+
+    public function updateCMSActions(FieldList $fields)
+    {
+        $fields->insertAfter('publish', FormAction::create('doSync', 'Sync with Cin7'));
     }
 
 }

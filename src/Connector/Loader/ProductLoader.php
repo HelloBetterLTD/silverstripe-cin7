@@ -43,10 +43,6 @@ class ProductLoader extends Loader
     {
         $product = Product::create([
             'ExternalID' => $data['id'],
-            'Model' => $data['styleCode'],
-            'Content' => $data['description'],
-            'StyleCode' => $data['styleCode'],
-            'CustomFields' => json_encode(!empty($data['customFields']) ? $data['customFields'] : []),
             'URLSegment' => URLSegmentFilter::create()->filter($data['name'])
         ]);
         $product->write();
@@ -88,7 +84,7 @@ class ProductLoader extends Loader
     }
 
 
-    public function load($data)
+    public function load($data, $force = false)
     {
         if ($this->canImportProduct($data)) {
             /* @var $product Product */
@@ -98,7 +94,7 @@ class ProductLoader extends Loader
                 $this->isNew = true;
                 $product = $this->createNewProduct($data);
             }
-            if ($product->ExternalHash != $this->getHash($data)) {
+            if ($force || $product->ExternalHash != $this->getHash($data)) {
                 $this->assignCategoriesToProduct($data, $product);
                 $this->importBasicData($data, $product);
                 $this->processVariations($data, $product);
@@ -122,6 +118,9 @@ class ProductLoader extends Loader
             'Depth' => $data['length'],
             'Brand' => $data['brand'],
             'StyleCode' => $data['styleCode'],
+            'Model' => $data['styleCode'],
+            'Content' => $data['description'],
+            'StyleCode' => $data['styleCode'],
             'CustomFields' => json_encode(!empty($data['customFields']) ? $data['customFields'] : []),
         ]);
         $product->write();
@@ -135,9 +134,11 @@ class ProductLoader extends Loader
             $product->VariationAttributeTypes()->add($sizeType);
         }
         foreach ($data['productOptions'] as $optionData) {
-            $variation = $this->importVariation($optionData, $product);
-            if ($variation) {
-                unset($variatonIDs[$variation->ID]);
+            if (in_array($optionData['status'], ['Active', 'Primary'])) {
+                $variation = $this->importVariation($optionData, $product);
+                if ($variation) {
+                    unset($variatonIDs[$variation->ID]);
+                }
             }
         }
         foreach ($variatonIDs as $id) {
@@ -177,8 +178,11 @@ class ProductLoader extends Loader
             $variation->AttributeValues()
                 ->add(AttributeTypeExtension::find_or_make_color_attribute($data['option1']));
         }
+
+        $priceIds = Price::get()->filter('VariationID', $variation->ID)->map('ID', 'ID')->toArray();
         foreach (PriceOption::get() as $option) {
-            if (!empty($data[$option->Label])) {
+            $label = $option->getCin7Label();
+            if (!empty($data['priceColumns']) && !empty($data['priceColumns'][$label])) {
                 $price = Price::get()->filter([
                     'PriceOptionID' => $option->ID,
                     'VariationID' => $variation->ID,
@@ -189,10 +193,19 @@ class ProductLoader extends Loader
                         'VariationID' => $variation->ID,
                     ]);
                 }
-                $price->Price = $data[$option->Label];
+                $price->Price = $data['priceColumns'][$label];
                 $price->write();
+
+                unset($priceIds[$price->ID]);
             }
         }
+
+        foreach ($priceIds as $priceId) {
+            if ($price = Price::get()->byID($priceId)) {
+                $price->delete();
+            }
+        }
+
         return $variation;
     }
 
