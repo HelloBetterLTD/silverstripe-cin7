@@ -6,6 +6,7 @@ use SilverShop\Model\Variation\Variation;
 use SilverShop\Page\Product;
 use SilverStripe\View\Parsers\URLSegmentFilter;
 use SilverStripers\Cin7\Extension\AttributeTypeExtension;
+use SilverStripers\Cin7\Extension\VariationExtension;
 use SilverStripers\Cin7\Model\Price;
 use SilverStripers\Cin7\Model\PriceOption;
 use SilverStripers\Cin7\Model\ProductCategory;
@@ -134,7 +135,7 @@ class ProductLoader extends Loader
             $product->VariationAttributeTypes()->add($sizeType);
         }
         foreach ($data['productOptions'] as $optionData) {
-            if (in_array($optionData['status'], ['Active', 'Primary'])) {
+            if (in_array($optionData['status'], [VariationExtension::PRIMARY, VariationExtension::ACTIVE])) {
                 $variation = $this->importVariation($optionData, $product);
                 if ($variation) {
                     unset($variatonIDs[$variation->ID]);
@@ -158,6 +159,7 @@ class ProductLoader extends Loader
         }
         $variation->update([
             'Title' => !empty($data['option1']) ? $data['option1'] : '',
+            'Status' => $data['status'],
             'InternalItemID' => $data['code'],
             'Price' => $data['retailPrice'],
             'Barcode' => $data['barcode'],

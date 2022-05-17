@@ -24,50 +24,64 @@ class OrderItemExtension extends DataExtension
                 $buyable = $owner->ProductVariation();
             }
 
+            $defaultPrice = PriceOption::get_default();
             $priceOptions = PriceOption::get();
             if ($member && $member->exists()) {
                 $groups = implode(',', array_merge([-1], $member->DirectGroups()->column('ID')));
                 $priceOptions = $priceOptions->where('(
-                NOT EXISTS (
+                    NOT EXISTS (
+                        SELECT 1 FROM Cin7_PriceOption_Groups
+                            WHERE "Cin7_PriceOptionID" = "Cin7_PriceOption"."ID"
+                            LIMIT 1
+                    )
+                    OR  EXISTS (
+                        SELECT 1 FROM Cin7_PriceOption_Groups
+                        WHERE
+                            "Cin7_PriceOptionID" = "Cin7_PriceOption"."ID"
+                            AND "GroupID" IN (' . $groups . ')
+                            LIMIT 1
+                    )
+                )');
+            } else {
+
+                $sql = 'NOT EXISTS (
                     SELECT 1 FROM Cin7_PriceOption_Groups
                         WHERE "Cin7_PriceOptionID" = "Cin7_PriceOption"."ID"
                         LIMIT 1
-                )
-                OR  EXISTS (
-                    SELECT 1 FROM Cin7_PriceOption_Groups
-                    WHERE
-                        "Cin7_PriceOptionID" = "Cin7_PriceOption"."ID"
-                        AND "GroupID" IN (' . $groups . ')
-                        LIMIT 1
-                )
-            )');
-            } else {
-                $priceOptions = $priceOptions->where('NOT EXISTS (
-                SELECT 1 FROM Cin7_PriceOption_Groups
-                    WHERE "Cin7_PriceOptionID" = "Cin7_PriceOption"."ID"
-                    LIMIT 1
-            )');
+                )';
+                if ($defaultPrice) {
+                    $sql .= ' OR ID = ' . $defaultPrice->ID;
+                    $priceOptions = $priceOptions->sort(
+                        sprintf('CASE WHEN ID = %s THEN 1 ELSE 0 END', $defaultPrice->ID),
+                        'DESC'
+                    );
+                }
+                $priceOptions = $priceOptions->where($sql);
             }
 
             if ($priceOptions->count()) {
-                $priceList = $buyable
+                foreach ($priceOptions as $priceOption) {
+                    $price = $buyable->Prices()->find('PriceOptionID', $priceOption->ID);
+                    if ($price) {
+                        $can = true;
+                        if ($priceOption->MinQuantity && $priceOption->MinQuantity > $quantity) {
+                            $can = false;
+                        }
+                        if ($priceOption->MaxQuantity && $priceOption->MaxQuantity < $quantity) {
+                            $can = false;
+                        }
+                        if ($can) {
+                            $price = $price->getPriceInclTax();
+                            break;
+                        }
+                    }
+                }
+            } elseif ($defaultPrice) {
+                $priceItem = $buyable
                     ->Prices()
-                    ->sort('Price')
-                    ->filter('PriceOption.ID', $priceOptions->column('ID'));
-
-                $quantity = $owner->Quantity;
-                foreach ($priceList as $priceItem) {
-                    $can = true;
-                    if ($priceItem->PriceOption()->MinQuantity && $priceItem->PriceOption()->MinQuantity > $quantity) {
-                        $can = false;
-                    }
-                    if ($priceItem->PriceOption()->MaxQuantity && $priceItem->PriceOption()->MaxQuantity < $quantity) {
-                        $can = false;
-                    }
-                    if ($can) {
-                        $price = $priceItem->Price;
-                        break;
-                    }
+                    ->find('PriceOption.ID', $priceOptions->column('ID'));
+                if ($price) {
+                    $price = $priceItem->getPriceInclTax();
                 }
             }
         }

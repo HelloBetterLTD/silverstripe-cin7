@@ -5,6 +5,7 @@ namespace SilverStripers\Cin7\Model;
 use SilverStripe\Forms\CheckboxSetField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\ValidationResult;
 use SilverStripe\Security\Group;
 
 class PriceOption extends DataObject
@@ -13,6 +14,7 @@ class PriceOption extends DataObject
     private static $db = [
         'Label' => 'Varchar',
         'Currency' => 'Varchar',
+        'Default' => 'Boolean',
         'MinQuantity' => 'Int',
         'MaxQuantity' => 'Int',
     ];
@@ -66,6 +68,28 @@ class PriceOption extends DataObject
                $option->delete();
             }
         }
+    }
+
+    public static function get_default()
+    {
+        return self::singleton()->getDefaultOption();
+    }
+
+    public function getDefaultOption()
+    {
+        return PriceOption::get()->find('Default', 1);
+    }
+
+    public function validate() : ValidationResult
+    {
+        $valid = parent::validate();
+        if ($this->Default) {
+            $anyothers = PriceOption::get()->exclude('ID', $this->ID)->filter('Default', 1);
+            if ($anyothers->count()) {
+                $valid->addFieldError('Default', 'There is another price option marked as default');
+            }
+        }
+        return $valid;
     }
 
     public function getCin7Label()

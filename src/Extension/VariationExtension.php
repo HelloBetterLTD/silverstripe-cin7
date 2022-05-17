@@ -9,9 +9,12 @@ use SilverStripers\Cin7\Model\Price;
 
 class VariationExtension extends DataExtension
 {
+    const PRIMARY = 'Primary';
+    const ACTIVE = 'Active';
 
     private static $db = [
         'Title' => 'Varchar',
+        'Status' => 'Varchar',
         'ExternalID' => 'Varchar',
         'Barcode' => 'Varchar',
         'WholesalePrice' => 'Currency(19,4)',
