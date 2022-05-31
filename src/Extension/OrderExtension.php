@@ -14,7 +14,8 @@ class OrderExtension extends DataExtension
 
     private static $db = [
         'ExternalID' => 'Varchar',
-        'ForceCin7Sync' => 'Boolean'
+        'ForceCin7Sync' => 'Boolean',
+        'PurchaseOrderNumber' => 'Varchar'
     ];
 
     private static $has_one = [
@@ -150,7 +151,7 @@ class OrderExtension extends DataExtension
         }
 
         return [
-             'id' => $order->ExternalID ? $order->ExternalID : null, //TODO:
+            'id' => $order->ExternalID ? $order->ExternalID : null, //TODO:
             'createdDate' => $order->dbObject('Placed')->Cin7Date(),
             'modifiedDate' => $order->dbObject('LastEdited')->Cin7Date(),
             'createdBy' => null,
@@ -219,7 +220,7 @@ class OrderExtension extends DataExtension
             'salesPersonEmail' => null, //
             'paymentTerms' => null, //
             'salesPersonEmail' => null, //
-            'customerOrderNo' => null, //
+            'customerOrderNo' => $order->PurchaseOrderNumber, //
             'voucherCode' => null, //
             'deliveryInstructions' => null, //
             'status' => $this->getCin7OrderStatus(), //
