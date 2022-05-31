@@ -10,7 +10,8 @@ class Stock extends DataObject
 
     private static $db = [
         'Available' => 'Int',
-        'StockOnHand' => 'Int'
+        'StockOnHand' => 'Int',
+        'ETD' => 'Datetime'
     ];
 
     private static $has_one = [

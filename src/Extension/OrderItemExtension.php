@@ -61,8 +61,8 @@ class OrderItemExtension extends DataExtension
 
             if ($priceOptions->count()) {
                 foreach ($priceOptions as $priceOption) {
-                    $price = $buyable->Prices()->find('PriceOptionID', $priceOption->ID);
-                    if ($price) {
+                    $priceOptionPrice = $buyable->Prices()->find('PriceOptionID', $priceOption->ID);
+                    if ($priceOptionPrice) {
                         $can = true;
                         if ($priceOption->MinQuantity && $priceOption->MinQuantity > $quantity) {
                             $can = false;
@@ -71,7 +71,7 @@ class OrderItemExtension extends DataExtension
                             $can = false;
                         }
                         if ($can) {
-                            $price = $price->getPriceInclTax();
+                            $price = $priceOptionPrice->getPriceInclTax();
                             break;
                         }
                     }
@@ -79,8 +79,8 @@ class OrderItemExtension extends DataExtension
             } elseif ($defaultPrice) {
                 $priceItem = $buyable
                     ->Prices()
-                    ->find('PriceOption.ID', $priceOptions->column('ID'));
-                if ($price) {
+                    ->find('PriceOption.ID', $defaultPrice->ID);
+                if ($priceItem) {
                     $price = $priceItem->getPriceInclTax();
                 }
             }
