@@ -66,7 +66,7 @@ class PriceOption extends DataObject
         return $valid;
     }
 
-    public function find_or_make($label)
+    public static function find_or_make($label)
     {
         $option = PriceOption::get()->find('Label', $label);
         if (!$option) {
