@@ -8,6 +8,7 @@ use SilverStripe\CMS\Controllers\ContentController;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
 
 class Cin7Connector
@@ -23,6 +24,7 @@ class Cin7Connector
     const BRANCHES_ENDPOINT = 'v1/Branches';
     const STOCK_ENDPOINT = 'v1/Stock';
     const POST_ORDER = 'v1/SalesOrders';
+    const POST_CONTACTS = 'v1/Contacts';
 
     private static $conn;
 
@@ -204,4 +206,17 @@ class Cin7Connector
         }
     }
 
+    public function syncMember(Member $member)
+    {
+        $data = $member->toCin7();
+        if (!$member->ExternalID) {
+            $response = $this->post(self::POST_CONTACTS, json_encode([$data]));
+            if ($response) {
+                $member->ExternalID = $response[0]['id'];
+                $member->write();
+            }
+        } else {
+            return $this->put(self::POST_CONTACTS, json_encode([$data]));
+        }
+    }
 }
