@@ -13,7 +13,6 @@ class PriceOption extends DataObject
 
     private static $db = [
         'Label' => 'Varchar',
-        'Currency' => 'Varchar',
         'Default' => 'Boolean',
         'MinQuantity' => 'Int',
         'MaxQuantity' => 'Int',
@@ -45,31 +44,6 @@ class PriceOption extends DataObject
         return $fields;
     }
 
-    public function requireDefaultRecords()
-    {
-        parent::requireDefaultRecords();
-        $optionIds = PriceOption::get()->map('ID', 'ID')->toArray();
-        foreach (self::config()->get('labels') as $config) {
-            $option = PriceOption::get()->find('Label', $config['label']);
-            if (!$option) {
-                $option = PriceOption::create();
-            }
-            $option->update([
-                'Label' => $config['label'],
-                'Currency' => $config['currency'],
-            ]);
-            $option->write();
-            unset($optionIds[$option->ID]);
-        }
-
-        // delete options
-        foreach ($optionIds as $id) {
-            if ($option = PriceOption::get()->byID($id)) {
-               $option->delete();
-            }
-        }
-    }
-
     public static function get_default()
     {
         return self::singleton()->getDefaultOption();
@@ -92,9 +66,16 @@ class PriceOption extends DataObject
         return $valid;
     }
 
-    public function getCin7Label()
+    public function find_or_make($label)
     {
-        return lcfirst($this->Label) . $this->Currency;
+        $option = PriceOption::get()->find('Label', $label);
+        if (!$option) {
+            $option = PriceOption::create([
+                'Label' => $label
+            ]);
+            $option->write();
+        }
+        return $option;
     }
 
     public function canCreate($member = null, $context = [])

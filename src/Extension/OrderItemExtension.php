@@ -27,21 +27,25 @@ class OrderItemExtension extends DataExtension
             $defaultPrice = PriceOption::get_default();
             $priceOptions = PriceOption::get();
             if ($member && $member->exists()) {
-                $groups = implode(',', array_merge([-1], $member->DirectGroups()->column('ID')));
-                $priceOptions = $priceOptions->where('(
-                    NOT EXISTS (
-                        SELECT 1 FROM Cin7_PriceOption_Groups
-                            WHERE "Cin7_PriceOptionID" = "Cin7_PriceOption"."ID"
-                            LIMIT 1
-                    )
-                    OR  EXISTS (
-                        SELECT 1 FROM Cin7_PriceOption_Groups
-                        WHERE
-                            "Cin7_PriceOptionID" = "Cin7_PriceOption"."ID"
-                            AND "GroupID" IN (' . $groups . ')
-                            LIMIT 1
-                    )
-                )');
+                if ($member->PriceColumn) {
+                    $priceOptions = $priceOptions->filter('Label', $member->PriceColumn);
+                } else {
+                    $groups = implode(',', array_merge([-1], $member->DirectGroups()->column('ID')));
+                    $priceOptions = $priceOptions->where('(
+                        NOT EXISTS (
+                            SELECT 1 FROM Cin7_PriceOption_Groups
+                                WHERE "Cin7_PriceOptionID" = "Cin7_PriceOption"."ID"
+                                LIMIT 1
+                        )
+                        OR  EXISTS (
+                            SELECT 1 FROM Cin7_PriceOption_Groups
+                            WHERE
+                                "Cin7_PriceOptionID" = "Cin7_PriceOption"."ID"
+                                AND "GroupID" IN (' . $groups . ')
+                                LIMIT 1
+                        )
+                    )');
+                }
             } else {
 
                 $sql = 'NOT EXISTS (

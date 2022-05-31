@@ -182,22 +182,21 @@ class ProductLoader extends Loader
         }
 
         $priceIds = Price::get()->filter('VariationID', $variation->ID)->map('ID', 'ID')->toArray();
-        foreach (PriceOption::get() as $option) {
-            $label = $option->getCin7Label();
-            if (!empty($data['priceColumns']) && !empty($data['priceColumns'][$label])) {
+        if (!empty($data['priceColumns'])) {
+            foreach ($data['priceColumns'] as $label => $priceColumnPrice) {
+                $priceOption = PriceOption::find_or_make($label);
                 $price = Price::get()->filter([
-                    'PriceOptionID' => $option->ID,
+                    'PriceOptionID' => $priceOption->ID,
                     'VariationID' => $variation->ID,
                 ])->first();
                 if (!$price) {
                     $price = Price::create([
-                        'PriceOptionID' => $option->ID,
+                        'PriceOptionID' => $priceOption->ID,
                         'VariationID' => $variation->ID,
                     ]);
                 }
-                $price->Price = $data['priceColumns'][$label];
+                $price->Price = $priceColumnPrice;
                 $price->write();
-
                 unset($priceIds[$price->ID]);
             }
         }
@@ -207,7 +206,6 @@ class ProductLoader extends Loader
                 $price->delete();
             }
         }
-
         return $variation;
     }
 

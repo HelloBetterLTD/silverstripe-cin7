@@ -209,14 +209,29 @@ class Cin7Connector
     public function syncMember(Member $member)
     {
         $data = $member->toCin7();
+        echo '<pre>' . print_r($data, 1) . '</pre>';
         if (!$member->ExternalID) {
             $response = $this->post(self::POST_CONTACTS, json_encode([$data]));
             if ($response) {
                 $member->ExternalID = $response[0]['id'];
                 $member->write();
             }
+            return $response;
         } else {
             return $this->put(self::POST_CONTACTS, json_encode([$data]));
         }
+    }
+
+    public function copyMember(Member $member)
+    {
+        $data = $member->toCin7();
+        if ($member->ExternalID) {
+            $response = $this->get(self::POST_CONTACTS . '/' . $member->ExternalID);
+            if ($response && array_key_exists('priceColumn', $response)) {
+                $member->PriceColumn = $response['priceColumn'];
+                $member->write();
+            }
+        }
+        return $member;
     }
 }

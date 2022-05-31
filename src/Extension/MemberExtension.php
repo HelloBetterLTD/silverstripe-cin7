@@ -14,6 +14,7 @@ class MemberExtension extends DataExtension
         'PhoneNumber' => 'Varchar',
         'Mobile' => 'Varchar',
         'ExternalID' => 'Int',
+        'PriceColumn' => 'Varchar'
     ];
 
     public function toCin7()
@@ -23,6 +24,8 @@ class MemberExtension extends DataExtension
             'id' => $member->ExternalID ? $member->ExternalID : null,
             'type' => 'Customer',
             'billingCompany' => $member->Company,
+            'firstName' => $member->FirstName,
+            'lastName' => $member->Surname,
             'accountsFirstName' => $member->FirstName,
             'accountsLastName' => $member->Surname,
             'billingEmail' => $member->Email,
@@ -34,11 +37,25 @@ class MemberExtension extends DataExtension
         return $data;
     }
 
-    public function syncWithCin7()
+    public function syncToCin7()
     {
         $member = $this->owner;
         $connector = Cin7Connector::init();
         return $connector->syncMember($member);
+    }
+
+    public function syncFromCin7()
+    {
+        $member = $this->owner;
+        $connector = Cin7Connector::init();
+        return $connector->copyMember($member);
+    }
+
+    public function afterMemberLoggedIn()
+    {
+        try {
+            $this->syncFromCin7();
+        } catch (\Exception $e) {}
     }
 
 }
