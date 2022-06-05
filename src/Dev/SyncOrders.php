@@ -31,6 +31,7 @@ class SyncOrders extends BuildTask
             $connector = Cin7Connector::init();
             foreach ($orders as $order) {
                 $connector->syncOrder($order);
+                $order->SyncOrdersToAPI = 0; // reset
                 sleep(1);
             }
         }
