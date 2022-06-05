@@ -2,13 +2,13 @@
 
 namespace SilverStripers\Cin7\Dev;
 
+use SilverShop\Model\Variation\Variation;
 use SilverShop\Page\Product;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\Versioned\Versioned;
 use SilverStripers\Cin7\Connector\Cin7Connector;
 use SilverStripers\Cin7\Connector\Loader\ProductLoader;
-use SilverStripers\Cin7\Model\Variation;
 
 class ImportPurchaseOrders extends BuildTask
 {
@@ -26,6 +26,7 @@ class ImportPurchaseOrders extends BuildTask
         Versioned::set_stage(Versioned::DRAFT);
         $conn = Cin7Connector::init();
         $pos = $conn->getPurchaseOrders();
+        echo 'STARTING ETD<br>';
         foreach ($pos as $po) {
             $etd = $po['estimatedDeliveryDate'];
             if (!$etd && $po['estimatedArrivalDate']) {
@@ -34,6 +35,7 @@ class ImportPurchaseOrders extends BuildTask
             if ($etd) {
                 foreach ($po['lineItems'] as $lineItem) {
                     $product = null;
+                    echo $lineItem['productOptionId'] . '<br>';
                     if ($lineItem['productId'] && $lineItem['productOptionId']) {
                         $product = Variation::get()->find('ExternalID', $lineItem['productOptionId']);
                     } else {
@@ -41,7 +43,8 @@ class ImportPurchaseOrders extends BuildTask
                     }
 
                     if ($product) {
-                        $product->NewStockETD = $this->cin7DateToDt($etd);
+                        echo 'PRODUCT FOUND<br>';
+                        $product->NewStockETD = $conn->cin7DateToDt($etd);
                         $product->NewStockQty = $lineItem['qty'];
                         $product->write();
                         if ($product->isPublished()) { // publish only previously published products
@@ -51,6 +54,7 @@ class ImportPurchaseOrders extends BuildTask
                 }
             }
         }
+        echo 'COMPLETE ETD<br>';
         Versioned::set_stage($stage);
     }
 
