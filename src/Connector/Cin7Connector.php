@@ -25,6 +25,7 @@ class Cin7Connector
     const STOCK_ENDPOINT = 'v1/Stock';
     const POST_ORDER = 'v1/SalesOrders';
     const POST_CONTACTS = 'v1/Contacts';
+    const PURCHASE_ORDERS = 'v1/PurchaseOrders';
 
     private static $conn;
 
@@ -232,5 +233,15 @@ class Cin7Connector
             }
         }
         return $member;
+    }
+
+    public function getPurchaseOrders()
+    {
+        return $this->get(self::PURCHASE_ORDERS);
+    }
+
+    public function cin7DateToDt($date)
+    {
+        return str_replace('Z', '', str_replace('T', ' ', $date));
     }
 }

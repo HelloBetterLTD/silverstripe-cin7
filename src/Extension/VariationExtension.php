@@ -22,6 +22,8 @@ class VariationExtension extends DataExtension
         'SpecialPrice' => 'Currency(19,4)',
         'StockAvailable' => 'Int',
         'StockOnHand' => 'Int',
+        'NewStockETD' => 'Datetime',
+        'NewStockQty' => 'Int'
     ];
 
     private static $has_many = [
@@ -35,8 +37,8 @@ class VariationExtension extends DataExtension
             PricingOptionsField::create('PricingOptions', 'Prices')
                 ->setBuyable($this->owner)
         );
-        
-        
+
+
     }
 
 }

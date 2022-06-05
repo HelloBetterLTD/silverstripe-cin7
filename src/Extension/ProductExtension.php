@@ -20,7 +20,9 @@ class ProductExtension extends DataExtension
         'ExternalID' => 'Int',
         'Brand' => 'Varchar',
         'StyleCode' => 'Varchar',
-        'CustomFields' => 'Text' // JSON
+        'CustomFields' => 'Text', // JSON
+        'NewStockETD' => 'Datetime',
+        'NewStockQty' => 'Int'
     ];
 
     private static $has_many = [
