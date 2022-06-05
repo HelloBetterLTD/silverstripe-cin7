@@ -209,7 +209,6 @@ class Cin7Connector
     public function syncMember(Member $member)
     {
         $data = $member->toCin7();
-        echo '<pre>' . print_r($data, 1) . '</pre>';
         if (!$member->ExternalID) {
             $response = $this->post(self::POST_CONTACTS, json_encode([$data]));
             if ($response) {

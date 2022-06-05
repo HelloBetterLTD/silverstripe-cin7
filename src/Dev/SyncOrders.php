@@ -32,6 +32,7 @@ class SyncOrders extends BuildTask
             foreach ($orders as $order) {
                 $connector->syncOrder($order);
                 $order->SyncOrdersToAPI = 0; // reset
+                $order->write();
                 sleep(1);
             }
         }
