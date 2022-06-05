@@ -10,7 +10,13 @@
             <% loop $ProcessedPriceOptions %>
                 <tr class="$EvenOdd $FirstLast">
                     <td>{$Title}</td>
-                    <td><input name="{$Name}" value="{$Value}" class="field text" type="text"></td>
+                    <td>
+                        <% if $Top.isReadonly %>
+                            <input name="{$Name}" value="{$Value}" class="field text" type="text" disabled="disabled">
+                        <% else %>
+                            <input name="{$Name}" value="{$Value}" class="field text" type="text">
+                        <% end_if %>
+                    </td>
                 </tr>
             <% end_loop %>
         </tbody>

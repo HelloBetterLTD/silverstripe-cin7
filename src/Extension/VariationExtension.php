@@ -35,6 +35,8 @@ class VariationExtension extends DataExtension
             PricingOptionsField::create('PricingOptions', 'Prices')
                 ->setBuyable($this->owner)
         );
+        
+        
     }
 
 }

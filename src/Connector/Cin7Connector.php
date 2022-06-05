@@ -81,7 +81,7 @@ class Cin7Connector
     public function getProducts() : array
     {
         $config = SiteConfig::current_site_config();
-        $response = $this->get(self::PRODUCTS_ENDPOINT, [
+        $response = $this->get(self::PRODUCTS_ENDPOINT . "?status='Public'", [
             'rows' => 10,
             'page' => $config->CurrentProductPage ?: 1
         ]);

@@ -54,4 +54,9 @@ class Branch extends DataObject
         return $fields;
     }
 
+    public function getTitle()
+    {
+        return $this->Company ? : parent::getTitle();
+    }
+
 }

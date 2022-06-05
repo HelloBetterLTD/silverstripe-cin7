@@ -59,6 +59,10 @@ class PricingOptionsField extends FormField
 
     public function saveInto(DataObjectInterface $record)
     {
+        if ($this->readonly) {
+            return;
+        }
+
         $buyable = $this->buyable;
         if (!$buyable->ID) {
             $buyable->write();
@@ -90,6 +94,13 @@ class PricingOptionsField extends FormField
                 $price->write();
             }
         }
+    }
+
+    public function performReadonlyTransformation()
+    {
+        $clone = clone $this;
+        $clone->setReadonly(true);
+        return $clone;
     }
 
 }
