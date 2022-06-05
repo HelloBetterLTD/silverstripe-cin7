@@ -26,7 +26,6 @@ class ImportPurchaseOrders extends BuildTask
         Versioned::set_stage(Versioned::DRAFT);
         $conn = Cin7Connector::init();
         $pos = $conn->getPurchaseOrders();
-        echo 'STARTING ETD<br>';
         foreach ($pos as $po) {
             $etd = $po['estimatedDeliveryDate'];
             if (!$etd && $po['estimatedArrivalDate']) {
@@ -35,7 +34,6 @@ class ImportPurchaseOrders extends BuildTask
             if ($etd) {
                 foreach ($po['lineItems'] as $lineItem) {
                     $product = null;
-                    echo $lineItem['productOptionId'] . '<br>';
                     if ($lineItem['productId'] && $lineItem['productOptionId']) {
                         $product = Variation::get()->find('ExternalID', $lineItem['productOptionId']);
                     } else {
@@ -43,7 +41,6 @@ class ImportPurchaseOrders extends BuildTask
                     }
 
                     if ($product) {
-                        echo 'PRODUCT FOUND<br>';
                         $product->NewStockETD = $conn->cin7DateToDt($etd);
                         $product->NewStockQty = $lineItem['qty'];
                         $product->write();
@@ -54,7 +51,6 @@ class ImportPurchaseOrders extends BuildTask
                 }
             }
         }
-        echo 'COMPLETE ETD<br>';
         Versioned::set_stage($stage);
     }
 
