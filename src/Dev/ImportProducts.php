@@ -26,6 +26,9 @@ class ImportProducts extends BuildTask
         foreach ($products as $product) {
             $loader->load($product);
         }
+
+
+
     }
 
 }

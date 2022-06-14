@@ -16,6 +16,8 @@ class ProductLoader extends Loader
 
     private $isNew = true;
 
+    private static $archive_others = true;
+
     private function findProduct($data)
     {
         return Product::get()->find('ExternalID', $data['id']);
@@ -81,15 +83,15 @@ class ProductLoader extends Loader
         $categories = ProductCategory::get()
             ->filter('ExternalID', $ids)
             ->where('ProductCategoryID > 0');
-        return $categories->count() > 0;
+        return !empty($data['status']) && $data['status'] == 'Public' && $categories->count() > 0;
     }
 
 
     public function load($data, $force = false)
     {
+        /* @var $product Product */
+        $product = $this->findProduct($data);
         if ($this->canImportProduct($data)) {
-            /* @var $product Product */
-            $product = $this->findProduct($data);
             $this->isNew = false;
             if (!$product) {
                 $this->isNew = true;
@@ -105,6 +107,9 @@ class ProductLoader extends Loader
                     $product->publishRecursive();
                 }
             }
+        } else if (self::config()->get('archive_others') && $product) {
+            $product->doUnpublish();
+            $product->doArchive();
         }
     }
 
