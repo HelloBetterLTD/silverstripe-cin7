@@ -62,7 +62,7 @@ class OrderItemExtension extends DataExtension
                             $can = false;
                         }
                         if ($can) {
-                            $price = $priceOptionPrice->getPriceInclTax();
+                            $price = $priceOptionPrice->Price;
                             break;
                         }
                     }
@@ -72,7 +72,7 @@ class OrderItemExtension extends DataExtension
                     ->Prices()
                     ->find('PriceOption.ID', $defaultPrice->ID);
                 if ($priceItem) {
-                    $price = $priceItem->getPriceInclTax();
+                    $price = $priceItem->Price;
                 }
             }
         }
