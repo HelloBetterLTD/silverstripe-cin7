@@ -195,7 +195,7 @@ class OrderExtension extends DataExtension
             'branchEmail' => null,
             'projectName' => null,
             'trackingCode' => null,
-            'internalComments' => null,
+            'internalComments' => $order->Notes,
             'productTotal' => $this->getProductTotal(),
             'freightTotal' => $this->getFreightTotal(),
             'freightDescription' => $this->getFreightDescription(),
