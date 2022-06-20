@@ -37,8 +37,22 @@ class VariationExtension extends DataExtension
             PricingOptionsField::create('PricingOptions', 'Prices')
                 ->setBuyable($this->owner)
         );
+    }
 
+    public function getSizeCode()
+    {
+        $sizeType = AttributeTypeExtension::find_or_make_size();
+        if ($val = $this->owner->AttributeValues()->find('TypeID', $sizeType->ID)) {
+            return $val->Value;
+        }
+    }
 
+    public function getColorCode()
+    {
+        $colorType = AttributeTypeExtension::find_or_make_color();
+        if ($val = $this->owner->AttributeValues()->find('TypeID', $colorType->ID)) {
+            return $val->Value;
+        }
     }
 
 }

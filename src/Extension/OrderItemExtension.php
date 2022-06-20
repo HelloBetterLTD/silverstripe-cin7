@@ -26,18 +26,14 @@ class OrderItemExtension extends DataExtension
 
             $defaultPrice = PriceOption::get_default();
             $priceOptions = PriceOption::get();
+            $matchedPriceOptions = null;
             if ($member && $member->exists()) {
                 if ($member->PriceColumn) {
-                    $priceOptions = $priceOptions->filter('Label', $member->PriceColumn);
+                    $matchedPriceOptions = $priceOptions->filter('Label', $member->PriceColumn);
                 } else {
                     $groups = implode(',', array_merge([-1], $member->DirectGroups()->column('ID')));
-                    $priceOptions = $priceOptions->where('(
-                        NOT EXISTS (
-                            SELECT 1 FROM Cin7_PriceOption_Groups
-                                WHERE "Cin7_PriceOptionID" = "Cin7_PriceOption"."ID"
-                                LIMIT 1
-                        )
-                        OR  EXISTS (
+                    $matchedPriceOptions = $priceOptions->where('(
+                        EXISTS (
                             SELECT 1 FROM Cin7_PriceOption_Groups
                             WHERE
                                 "Cin7_PriceOptionID" = "Cin7_PriceOption"."ID"
@@ -46,21 +42,12 @@ class OrderItemExtension extends DataExtension
                         )
                     )');
                 }
-            } else {
+            }
 
-                $sql = 'NOT EXISTS (
-                    SELECT 1 FROM Cin7_PriceOption_Groups
-                        WHERE "Cin7_PriceOptionID" = "Cin7_PriceOption"."ID"
-                        LIMIT 1
-                )';
-                if ($defaultPrice) {
-                    $sql .= ' OR ID = ' . $defaultPrice->ID;
-                    $priceOptions = $priceOptions->sort(
-                        sprintf('CASE WHEN ID = %s THEN 1 ELSE 0 END', $defaultPrice->ID),
-                        'DESC'
-                    );
-                }
-                $priceOptions = $priceOptions->where($sql);
+            if ($matchedPriceOptions && $matchedPriceOptions->count()) {
+                $priceOptions = $matchedPriceOptions;
+            } else if ($defaultPrice) {
+                $priceOptions = $priceOptions->filter('ID', $defaultPrice->ID);
             }
 
             if ($priceOptions->count()) {

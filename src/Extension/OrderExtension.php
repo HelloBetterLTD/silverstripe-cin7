@@ -125,24 +125,28 @@ class OrderExtension extends DataExtension
         $count = 0;
         foreach ($order->Items() as $orderItem) {
             $count += 1;
-            $product = get_class($orderItem) === OrderItem::class ? $orderItem->ProductVariation() : $orderItem->Product();
+            $product = $orderItem->Product();
+            $buyable = get_class($orderItem) === OrderItem::class ? $orderItem->ProductVariation() : $orderItem->Product();
 
             $lineItems[] = [
-                // 'id' => 0,
+                // 'id' => $orderItem->ID,
+                'styleCode' => method_exists($buyable, 'getColorCode') ? $buyable->getSizeCode() : '',
+                'sizeCodes' => method_exists($buyable, 'getSizeCode') ? $buyable->getSizeCode() : '',
                 'createdDate' => $order->dbObject('Placed')->Cin7Date(),
                 'transactionId' => $order->Reference,
                 'parentId' => null, //
-                'productId' => $product->ExternalID,
-                // 'productOptionId' => $product->ExternalID,
-                'integrationRef' => $product->ExternalID,
+                'productId' => $buyable->ExternalID,
+                'productOptionId' => $buyable->ExternalID,
+                'integrationRef' => $buyable->ExternalID,
                 'sort' => $count,
-                'code' => $product->Code,
+                'code' => $buyable->InternalItemID,
                 'name' => $product->Title,
-                'qty' => $product->Quantity,
-                // 'styleCode' => '', // TODO
-                'barcode' => $product->Barcode,
+                'qty' => $orderItem->Quantity,
+                'barcode' => $buyable->Barcode,
                 'unitCost' => $orderItem->UnitPrice,
                 'unitPrice' => $orderItem->UnitPrice,
+                'option1' => method_exists($buyable, 'getColorCode') ? $buyable->getColorCode() : '',
+                'option2' => method_exists($buyable, 'getSizeCode') ? $orderItem->Quantity . ' x ' .$buyable->getSizeCode() : '',
                 // 'discount' => 0, // TODO
 //                'holdingQty' => 0,
 //                'accountCode' => 0,
