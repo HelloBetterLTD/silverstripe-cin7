@@ -129,8 +129,6 @@ class OrderExtension extends DataExtension
             $product = $orderItem->Product();
             $buyable = get_class($orderItem) === OrderItem::class ? $orderItem->ProductVariation() : $orderItem->Product();
 
-
-
             $lineItems[] = [
                 // 'id' => $orderItem->ID,
                 'styleCode' => ClassInfo::hasMethod($buyable, 'getColorCode') ? $buyable->getColorCode() : '',
@@ -138,8 +136,8 @@ class OrderExtension extends DataExtension
                 'createdDate' => $order->dbObject('Placed')->Cin7Date(),
                 'transactionId' => $order->Reference,
                 'parentId' => null, //
-                'productId' => $buyable->ExternalID,
-                'productOptionId' => $buyable->ExternalID,
+                'productId' => $product->ExternalID,
+                'productOptionId' => ClassInfo::hasMethod($buyable, 'getProductOptionId') ? $buyable->getProductOptionId() : '',
                 'integrationRef' => $buyable->ExternalID,
                 'sort' => $count,
                 'code' => $buyable->InternalItemID,
@@ -150,14 +148,15 @@ class OrderExtension extends DataExtension
                 'unitPrice' => $orderItem->UnitPrice,
                 'option1' => ClassInfo::hasMethod($buyable, 'getColorCode') ? $buyable->getColorCode() : '',
                 'option2' => ClassInfo::hasMethod($buyable, 'getSizeCode') ? $orderItem->Quantity . ' x ' .$buyable->getSizeCode() : '',
-                // 'discount' => 0, // TODO
+//                'discount' => 0, // TODO
 //                'holdingQty' => 0,
 //                'accountCode' => 0,
 //                'stockControl' => 0,
             ];
         }
 
-        return [
+        $data = [];
+        $data[] = [
             'id' => $order->ExternalID ? $order->ExternalID : null, //TODO:
             'createdDate' => $order->dbObject('Placed')->Cin7Date(),
             'modifiedDate' => $order->dbObject('LastEdited')->Cin7Date(),
@@ -241,6 +240,8 @@ class OrderExtension extends DataExtension
             'lineItems' => $lineItems
         ];
 
+        $order->invokeWithExtensions('updateToCin7', $data);
+        return $data;
 
     }
 

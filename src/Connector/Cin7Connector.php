@@ -197,13 +197,13 @@ class Cin7Connector
     {
         $data = $order->toCin7();
         if (!$order->ExternalID) {
-            $response = $this->post(self::POST_ORDER, json_encode([$data]));
+            $response = $this->post(self::POST_ORDER, json_encode($data));
             if ($response) {
                 $order->ExternalID = $response[0]['id'];
                 $order->write();
             }
         } else {
-            return $this->put(self::POST_ORDER, json_encode([$data]));
+            return $this->put(self::POST_ORDER, json_encode($data));
         }
     }
 

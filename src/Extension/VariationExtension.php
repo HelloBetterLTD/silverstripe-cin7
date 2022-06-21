@@ -55,4 +55,13 @@ class VariationExtension extends DataExtension
         }
     }
 
+    public function getProductOptionId()
+    {
+        $variation = $this->owner;
+        if ($variation->ExternalID) {
+            $parts = explode('//', $variation->ExternalID);
+            return $parts[0];
+        }
+    }
+
 }
