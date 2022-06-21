@@ -6,6 +6,7 @@ use SilverShop\Discounts\Model\Modifiers\OrderDiscountModifier;
 use SilverShop\Model\Modifiers\Shipping\Base;
 use SilverShop\Model\Order;
 use SilverShop\Model\Variation\OrderItem;
+use SilverStripe\Core\ClassInfo;
 use SilverStripe\ORM\DataExtension;
 use SilverStripers\Cin7\Model\Branch;
 
@@ -128,10 +129,12 @@ class OrderExtension extends DataExtension
             $product = $orderItem->Product();
             $buyable = get_class($orderItem) === OrderItem::class ? $orderItem->ProductVariation() : $orderItem->Product();
 
+
+
             $lineItems[] = [
                 // 'id' => $orderItem->ID,
-                'styleCode' => method_exists($buyable, 'getColorCode') ? $buyable->getSizeCode() : '',
-                'sizeCodes' => method_exists($buyable, 'getSizeCode') ? $buyable->getSizeCode() : '',
+                'styleCode' => ClassInfo::hasMethod($buyable, 'getColorCode') ? $buyable->getColorCode() : '',
+                'sizeCodes' => ClassInfo::hasMethod($buyable, 'getSizeCode') ? $buyable->getSizeCode() : '',
                 'createdDate' => $order->dbObject('Placed')->Cin7Date(),
                 'transactionId' => $order->Reference,
                 'parentId' => null, //
@@ -145,8 +148,8 @@ class OrderExtension extends DataExtension
                 'barcode' => $buyable->Barcode,
                 'unitCost' => $orderItem->UnitPrice,
                 'unitPrice' => $orderItem->UnitPrice,
-                'option1' => method_exists($buyable, 'getColorCode') ? $buyable->getColorCode() : '',
-                'option2' => method_exists($buyable, 'getSizeCode') ? $orderItem->Quantity . ' x ' .$buyable->getSizeCode() : '',
+                'option1' => ClassInfo::hasMethod($buyable, 'getColorCode') ? $buyable->getColorCode() : '',
+                'option2' => ClassInfo::hasMethod($buyable, 'getSizeCode') ? $orderItem->Quantity . ' x ' .$buyable->getSizeCode() : '',
                 // 'discount' => 0, // TODO
 //                'holdingQty' => 0,
 //                'accountCode' => 0,
