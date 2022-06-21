@@ -144,7 +144,7 @@ class OrderExtension extends DataExtension
                 'name' => $product->Title,
                 'qty' => $orderItem->Quantity,
                 'barcode' => $buyable->Barcode,
-                'unitCost' => $orderItem->UnitPrice,
+                'unitCost' => 0, // $orderItem->UnitPrice,
                 'unitPrice' => $orderItem->UnitPrice,
                 'option1' => ClassInfo::hasMethod($buyable, 'getColorCode') ? $buyable->getColorCode() : '',
                 'option3' => ClassInfo::hasMethod($buyable, 'getSizeCode') ? $orderItem->Quantity . ' x ' .$buyable->getSizeCode() : '',
