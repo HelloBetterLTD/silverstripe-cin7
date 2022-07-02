@@ -172,6 +172,8 @@ class OrderExtension extends DataExtension
             'company' => $member->exists() ? $member->Company : '',
             'phone' => $member->exists() ? $member->PhoneNumber : '',
             'mobile' => $member->exists() ? $member->Mobile : '',
+
+
             'deliveryFirstName' => $shipping->FirstName ? : ($member->exists() ? $member->FirstName : $order->FirstName),
             'deliveryLastName' => $shipping->Surname ? : ($member->exists() ? $member->Surname : $order->Surname),
             'deliveryCompany' => $shipping->Company ? : ($member->exists() ? $member->Company : ''),
@@ -182,8 +184,6 @@ class OrderExtension extends DataExtension
             'deliveryPostalCode' => $shipping->PostalCode,
             'deliveryCountry' => $shipping->Country,
             'deliveryPostalCode' => $shipping->PostalCode,
-            'deliveryPostalCode' => $shipping->PostalCode,
-
 
             'billingFirstName' => $billing->FirstName ? : ($member->exists() ? $member->FirstName : $order->FirstName),
             'billingLastName' => $billing->Surname ? : ($member->exists() ? $member->Surname : $order->Surname),
@@ -191,12 +191,11 @@ class OrderExtension extends DataExtension
             'billingAddress1' => $billing->Address,
             'billingAddress2' => $billing->AddressLine2,
             'billingCity' => $billing->City,
-            'deliveryState' => $billing->State,
-            'deliveryPostalCode' => $billing->PostalCode,
-            'deliveryCountry' => $billing->Country,
             'billingPostalCode' => $billing->PostalCode,
             'billingState' => $billing->State,
             'billingCountry' => $billing->Country,
+
+            
             'branchId' => $order->Branch()->exists() ? $order->Branch()->ExternalID : null,
             'branchEmail' => null,
             'projectName' => null,
