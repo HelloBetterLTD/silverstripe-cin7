@@ -26,6 +26,7 @@ class Cin7Connector
     const POST_ORDER = 'v1/SalesOrders';
     const POST_CONTACTS = 'v1/Contacts';
     const PURCHASE_ORDERS = 'v1/PurchaseOrders';
+    const GET_SALES_ORDERS = 'v1/SalesOrders';
 
     private static $conn;
 
@@ -235,13 +236,22 @@ class Cin7Connector
         return $member;
     }
 
-    public function getPurchaseOrders()
+    public function getPurchaseOrders($page = 0)
     {
-        return $this->get(self::PURCHASE_ORDERS);
+        $params = [];
+        if ($page) {
+            $params['page'] = $page;
+        }
+        return $this->get(self::PURCHASE_ORDERS, $params);
     }
 
     public function cin7DateToDt($date)
     {
         return str_replace('Z', '', str_replace('T', ' ', $date));
+    }
+
+    public function getOrders()
+    {
+        return $this->get(self::GET_SALES_ORDERS);
     }
 }
