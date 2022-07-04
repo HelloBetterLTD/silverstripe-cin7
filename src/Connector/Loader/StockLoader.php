@@ -14,7 +14,7 @@ class StockLoader extends Loader
     {
         $branch = Branch::get()->find('ExternalID', $data['branchId']);
         $product = Product::get()->find('ExternalID', $data['productId']);
-        $variation = Variation::get()->find('ExternalID', $data['productOptionId']);
+        $variation = Variation::get()->find('ExternalID', $data['productOptionId'] . '//' . $data['size']);
         if ($branch && $product) {
             $filters = [
                 'BranchID' => $branch->ID,

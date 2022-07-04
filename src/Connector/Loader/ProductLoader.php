@@ -176,6 +176,8 @@ class ProductLoader extends Loader
         ]);
         $variation->write();
 
+        $variation->AttributeValues()->removeAll(); // remove all first and then add again.
+
         if (!empty($data['size'])) {
             $variation->AttributeValues()
                 ->add(AttributeTypeExtension::find_or_make_size_attribute($data['size']));

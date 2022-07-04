@@ -36,3 +36,7 @@ SilverStripe\Assets\File:
 SilverShop\Model\Variation\AttributeType:
   extensions:
     - SilverStripers\Cin7\Extension\AttributeTypeExtension
+
+SilverShop\Admin\ProductCatalogAdmin:
+  extensions:
+    - SilverStripers\Cin7\Extension\ProductCatalogAdminExtension
