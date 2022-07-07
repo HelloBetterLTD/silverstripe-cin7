@@ -84,17 +84,19 @@ class Cin7Connector
     public function getProducts() : array
     {
         $config = SiteConfig::current_site_config();
-        $response = $this->get(self::PRODUCTS_ENDPOINT, [
+
+        $params = [
             'rows' => 20,
             'page' => $config->CurrentProductPage ?: 1
-        ]);
-
+        ];
         if ($config->ProductLastImported) {
             $params['where'] = sprintf(
                 "where=modifiedDate>='%s'",
                 $this->dateToCin7Date($config->ProductLastImported)
             );
         }
+
+        $response = $this->get(self::PRODUCTS_ENDPOINT, $params);
 
         if (empty($response)) {
             $config->CurrentProductPage = 1;
@@ -171,9 +173,7 @@ class Cin7Connector
     public function getStockForProduct($sku) : array
     {
         return $this->get(self::STOCK_ENDPOINT, [
-            'where' => [
-                'code' => "'$sku'"
-            ]
+            'where' => "code='$sku'"
         ]);
     }
 
@@ -191,18 +191,17 @@ class Cin7Connector
     public function getStocks()
     {
         $config = SiteConfig::current_site_config();
-        $response = $this->get(self::STOCK_ENDPOINT, [
+        $params = [
             'rows' => 250,
             'page' => $config->CurrentStockPage ?: 1
-        ]);
-
+        ];
         if ($config->StockLastImported) {
             $params['where'] = sprintf(
                 "where=modifiedDate>='%s'",
                 $this->dateToCin7Date($config->StockLastImported)
             );
         }
-
+        $response = $this->get(self::STOCK_ENDPOINT, $params);
         if (empty($response)) {
             $config->CurrentStockPage = 1;
             $config->StockLastImported = DBDatetime::now()->getValue();
