@@ -14,7 +14,8 @@ class MemberExtension extends DataExtension
         'PhoneNumber' => 'Varchar',
         'Mobile' => 'Varchar',
         'ExternalID' => 'Int',
-        'PriceColumn' => 'Varchar'
+        'PriceColumn' => 'Varchar',
+        'Cin7Data' => 'Text'
     ];
 
     public function toCin7()

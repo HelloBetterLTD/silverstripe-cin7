@@ -228,10 +228,11 @@ class Cin7Connector
         $data = $member->toCin7();
         if ($member->ExternalID) {
             $response = $this->get(self::POST_CONTACTS . '/' . $member->ExternalID);
+            $member->Cin7Data = json_encode($response);
             if ($response && array_key_exists('priceColumn', $response)) {
                 $member->PriceColumn = $response['priceColumn'];
-                $member->write();
             }
+            $member->write();
         }
         return $member;
     }
