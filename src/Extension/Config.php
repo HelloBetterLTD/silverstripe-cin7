@@ -24,7 +24,13 @@ class Config extends DataExtension
         'DevAPIConnectionKey' => 'Varchar',
 
         'CurrentProductPage' => 'Int',
+        'ProductLastImported' => 'Datetime',
+
         'CurrentStockPage' => 'Int',
+        'StockLastImported' => 'Datetime',
+
+        'CurrentPOPage' => 'Int',
+        'POLastImported' => 'Datetime',
 
         'SyncOrdersToAPI' => 'Boolean'
     ];

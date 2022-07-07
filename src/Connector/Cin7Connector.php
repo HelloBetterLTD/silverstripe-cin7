@@ -8,6 +8,7 @@ use SilverStripe\CMS\Controllers\ContentController;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
 
@@ -87,8 +88,17 @@ class Cin7Connector
             'rows' => 20,
             'page' => $config->CurrentProductPage ?: 1
         ]);
+
+        if ($config->ProductLastImported) {
+            $params['where'] = sprintf(
+                "where=modifiedDate>='%s'",
+                $this->dateToCin7Date($config->ProductLastImported)
+            );
+        }
+
         if (empty($response)) {
             $config->CurrentProductPage = 1;
+            $config->ProductLastImported = DBDatetime::now()->getValue();
         } else {
             $config->CurrentProductPage += 1;
         }
@@ -185,8 +195,17 @@ class Cin7Connector
             'rows' => 250,
             'page' => $config->CurrentStockPage ?: 1
         ]);
+
+        if ($config->StockLastImported) {
+            $params['where'] = sprintf(
+                "where=modifiedDate>='%s'",
+                $this->dateToCin7Date($config->StockLastImported)
+            );
+        }
+
         if (empty($response)) {
             $config->CurrentStockPage = 1;
+            $config->StockLastImported = DBDatetime::now()->getValue();
         } else {
             $config->CurrentStockPage += 1;
         }
@@ -240,15 +259,43 @@ class Cin7Connector
     public function getPurchaseOrders($page = 0)
     {
         $params = [];
+        $config = SiteConfig::current_site_config();
         if ($page) {
             $params['page'] = $page;
+        } else {
+            $params['page'] = $config->CurrentPOPage == 0 ? 1 : $config->CurrentPOPage;
         }
-        return $this->get(self::PURCHASE_ORDERS, $params);
+        if ($config->POLastImported) {
+            $params['where'] = sprintf(
+                "where=modifiedDate>='%s'",
+                $this->dateToCin7Date($config->POLastImported)
+            );
+        }
+
+        $response = $this->get(self::PURCHASE_ORDERS, $params);
+        if (empty($response)) {
+            $config->CurrentPOPage = 1;
+            $config->POLastImported = DBDatetime::now()->getValue();
+        } else {
+            $config->CurrentPOPage += 1;
+        }
+        $config->write();
+        return $response;
     }
 
     public function cin7DateToDt($date)
     {
         return str_replace('Z', '', str_replace('T', ' ', $date));
+    }
+
+    public function dateToCin7Date($date)
+    {
+        $dt = strtotime($date);
+        return sprintf(
+            '%sT%sZ',
+            date('Y-m-d', $dt),
+            date('H:i:s', $dt)
+        );
     }
 
     public function getOrders()

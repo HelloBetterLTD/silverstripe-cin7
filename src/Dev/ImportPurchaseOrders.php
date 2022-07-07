@@ -25,7 +25,7 @@ class ImportPurchaseOrders extends BuildTask
         $stage = Versioned::get_stage();
         Versioned::set_stage(Versioned::DRAFT);
         $conn = Cin7Connector::init();
-        $page = $request->getVar('page') ? $request->getVar('page') : 0;
+        $page = $request && $request->getVar('page') ? $request->getVar('page') : 0;
         $pos = $conn->getPurchaseOrders($page);
         foreach ($pos as $po) {
             $etd = $po['estimatedDeliveryDate'];
