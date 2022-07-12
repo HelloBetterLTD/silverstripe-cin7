@@ -6,6 +6,7 @@ use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\Image;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataExtension;
 use SilverStripers\Cin7\Connector\Cin7Connector;
 use SilverStripers\Cin7\Connector\Loader\ProductLoader;
@@ -22,7 +23,8 @@ class ProductExtension extends DataExtension
         'StyleCode' => 'Varchar',
         'CustomFields' => 'Text', // JSON
         'NewStockETD' => 'Datetime',
-        'NewStockQty' => 'Int'
+        'NewStockQty' => 'Int',
+        'Volume' => 'Decimal(12, 5)',
     ];
 
     private static $has_many = [
@@ -43,9 +45,12 @@ class ProductExtension extends DataExtension
     {
         $product = $this->owner;
         $fields->removeByName([
-            'Prices'
+            'Prices',
+            'Volume'
         ]);
         $fields->addFieldToTab('Root.Images', UploadField::create('Images'));
+
+        $fields->insertAfter('Depth', TextField::create('Volume'));
 
         if (!$product->Variations()->count()) {
             $fields->addFieldToTab(

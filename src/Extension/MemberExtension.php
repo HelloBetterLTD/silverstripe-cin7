@@ -3,6 +3,7 @@
 
 namespace SilverStripers\Cin7\Extension;
 
+use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataExtension;
 use SilverStripers\Cin7\Connector\Cin7Connector;
 
@@ -17,6 +18,13 @@ class MemberExtension extends DataExtension
         'PriceColumn' => 'Varchar',
         'Cin7Data' => 'Text'
     ];
+
+    public function updateCMSFields(FieldList $fields)
+    {
+        $fields->removeByName([
+            'Cin7Data'
+        ]);
+    }
 
     public function toCin7()
     {

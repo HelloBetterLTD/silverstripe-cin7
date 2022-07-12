@@ -122,6 +122,7 @@ class ProductLoader extends Loader
             'Height' => $data['height'],
             'Width' => $data['width'],
             'Depth' => $data['length'],
+            'Volume' => $data['volume'],
             'Brand' => $data['brand'],
             'StyleCode' => $data['styleCode'],
             'Model' => $data['styleCode'],
