@@ -91,7 +91,7 @@ class Cin7Connector
         ];
         if ($config->ProductLastImported) {
             $params['where'] = sprintf(
-                "where=modifiedDate>='%s'",
+                "modifiedDate>='%s'",
                 $this->dateToCin7Date($config->ProductLastImported)
             );
         }
@@ -197,7 +197,7 @@ class Cin7Connector
         ];
         if ($config->StockLastImported) {
             $params['where'] = sprintf(
-                "where=modifiedDate>='%s'",
+                "modifiedDate>='%s'",
                 $this->dateToCin7Date($config->StockLastImported)
             );
         }
@@ -266,7 +266,7 @@ class Cin7Connector
         }
         if ($config->POLastImported) {
             $params['where'] = sprintf(
-                "where=modifiedDate>='%s'",
+                "modifiedDate>='%s'",
                 $this->dateToCin7Date($config->POLastImported)
             );
         }
