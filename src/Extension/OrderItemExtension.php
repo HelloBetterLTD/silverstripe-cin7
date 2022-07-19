@@ -28,8 +28,8 @@ class OrderItemExtension extends DataExtension
             $priceOptions = PriceOption::get();
             $matchedPriceOptions = null;
             if ($member && $member->exists()) {
-                if ($member->PriceColumn) {
-                    $matchedPriceOptions = $priceOptions->filter('Label', $member->PriceColumn);
+                if ($member->getAffectedPriceColumn()) {
+                    $matchedPriceOptions = $priceOptions->filter('Label', $member->getAffectedPriceColumn());
                 } else {
                     $groups = implode(',', array_merge([-1], $member->DirectGroups()->column('ID')));
                     $matchedPriceOptions = $priceOptions->where('(

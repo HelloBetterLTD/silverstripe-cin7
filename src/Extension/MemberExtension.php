@@ -57,6 +57,7 @@ class MemberExtension extends DataExtension
     {
         $member = $this->owner;
         $connector = Cin7Connector::init();
+        $this->owner->invokeWithExtensions('updateMemberToSync', $member);
         return $connector->copyMember($member);
     }
 
@@ -65,6 +66,14 @@ class MemberExtension extends DataExtension
         try {
             $this->syncFromCin7();
         } catch (\Exception $e) {}
+    }
+
+    public function getAffectedPriceColumn()
+    {
+        $member = $this->owner;
+        $col = $member->PriceColumn;
+        $member->invokeWithExtensions('updateAffectedPriceColumn', $col);
+        return $col;
     }
 
 }
