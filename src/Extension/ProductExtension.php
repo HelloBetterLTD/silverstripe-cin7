@@ -25,6 +25,7 @@ class ProductExtension extends DataExtension
         'NewStockETD' => 'Datetime',
         'NewStockQty' => 'Int',
         'Volume' => 'Decimal(12, 5)',
+        'Cin7Categories' => 'Text'
     ];
 
     private static $has_many = [
@@ -46,7 +47,8 @@ class ProductExtension extends DataExtension
         $product = $this->owner;
         $fields->removeByName([
             'Prices',
-            'Volume'
+            'Volume',
+            'Cin7Categories'
         ]);
         $fields->addFieldToTab('Root.Images', UploadField::create('Images'));
 
