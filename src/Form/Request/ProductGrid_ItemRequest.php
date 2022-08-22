@@ -5,10 +5,11 @@ namespace SilverStripers\Cin7\Form\Request;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use SilverStripe\ORM\ValidationResult;
+use SilverStripe\Versioned\VersionedGridFieldItemRequest;
 use SilverStripers\Cin7\Connector\Cin7Connector;
 use SilverStripers\Cin7\Connector\Loader\ProductLoader;
 
-class ProductGrid_ItemRequest extends GridFieldDetailForm_ItemRequest
+class ProductGrid_ItemRequest extends VersionedGridFieldItemRequest
 {
 
     private static $allowed_actions = [
