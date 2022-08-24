@@ -33,8 +33,9 @@ class ImportProducts extends BuildTask
         while($run) {
             Log::printLn('Querying product page: ' . $page);
             $products = $conn->getProducts($page, $config->ProductLastImported);
+            Log::printLn('Recieved products : ' . count($products));
             foreach ($products as $product) {
-                Log::printLn('Imported product ' . $data['id']);
+                Log::printLn('Checking product ' . $product['id']);
                 $loader->load($product);
             }
             $page += 1;

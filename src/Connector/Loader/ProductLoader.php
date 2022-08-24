@@ -10,6 +10,7 @@ use SilverStripers\Cin7\Extension\VariationExtension;
 use SilverStripers\Cin7\Model\Price;
 use SilverStripers\Cin7\Model\PriceOption;
 use SilverStripers\Cin7\Model\ProductCategory;
+use SilverStripers\Out\System\Log;
 
 class ProductLoader extends Loader
 {
@@ -92,12 +93,15 @@ class ProductLoader extends Loader
         /* @var $product Product */
         $product = $this->findProduct($data);
         if ($this->canImportProduct($data)) {
+            Log::printLn('Can import product ' . $product['id']);
             $this->isNew = false;
             if (!$product) {
                 $this->isNew = true;
                 $product = $this->createNewProduct($data);
+                Log::printLn('Created new product for ' . $product['id']);
             }
             if ($force || $product->ExternalHash != $this->getHash($data)) {
+                Log::printLn('Imported products ' . $product['id']);
                 $this->assignCategoriesToProduct($data, $product);
                 $this->importBasicData($data, $product);
                 $this->processVariations($data, $product);
