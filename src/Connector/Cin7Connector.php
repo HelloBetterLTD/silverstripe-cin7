@@ -260,32 +260,48 @@ class Cin7Connector
         return $member;
     }
 
-    public function getPurchaseOrders($page = 0)
+    public function getPurchaseOrders($page = 0, $lastImported = null)
     {
-        $params = [];
-        $config = SiteConfig::current_site_config();
-        if ($page) {
-            $params['page'] = $page;
-        } else {
-            $params['page'] = $config->CurrentPOPage == 0 ? 1 : $config->CurrentPOPage;
-        }
-        if ($config->POLastImported) {
+        $params = [
+            'rows' => 250,
+            'page' => $page ?: 1
+        ];
+        if ($lastImported) {
             $params['where'] = sprintf(
                 "modifiedDate>='%s'",
-                $this->dateToCin7Date($config->POLastImported)
+                $this->dateToCin7Date($lastImported)
             );
         }
-
         $response = $this->get(self::PURCHASE_ORDERS, $params);
-        if (empty($response)) {
-            $config->CurrentPOPage = 1;
-            $config->POLastImported = DBDatetime::now()->getValue();
-        } else {
-            $config->CurrentPOPage += 1;
-        }
-        $config->write();
         return $response;
     }
+
+//    public function getPurchaseOrders($page = 0)
+//    {
+//        $params = [];
+//        $config = SiteConfig::current_site_config();
+//        if ($page) {
+//            $params['page'] = $page;
+//        } else {
+//            $params['page'] = $config->CurrentPOPage == 0 ? 1 : $config->CurrentPOPage;
+//        }
+//        if ($config->POLastImported) {
+//            $params['where'] = sprintf(
+//                "modifiedDate>='%s'",
+//                $this->dateToCin7Date($config->POLastImported)
+//            );
+//        }
+//
+//        $response = $this->get(self::PURCHASE_ORDERS, $params);
+//        if (empty($response)) {
+//            $config->CurrentPOPage = 1;
+//            $config->POLastImported = DBDatetime::now()->getValue();
+//        } else {
+//            $config->CurrentPOPage += 1;
+//        }
+//        $config->write();
+//        return $response;
+//    }
 
     public function cin7DateToDt($date)
     {

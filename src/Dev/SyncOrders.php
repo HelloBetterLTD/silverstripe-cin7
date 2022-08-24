@@ -6,6 +6,7 @@ use SilverShop\Model\Order;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripers\Cin7\Connector\Cin7Connector;
+use SilverStripers\Out\System\Log;
 
 class SyncOrders extends BuildTask
 {
@@ -30,9 +31,10 @@ class SyncOrders extends BuildTask
             )->limit(3); // honor Cin7 throttle and process only three items
             $connector = Cin7Connector::init();
             foreach ($orders as $order) {
+                Log::printLn('Syncing order : ' . $order->ID);
                 $connector->syncOrder($order);
                 $order->ForceCin7Sync = 0; // reset
-                $order->write(); 
+                $order->write();
                 sleep(1);
             }
         }

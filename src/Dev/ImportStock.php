@@ -8,6 +8,7 @@ use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripers\Cin7\Connector\Cin7Connector;
 use SilverStripers\Cin7\Connector\Loader\StockLoader;
+use SilverStripers\Out\System\Log;
 
 class ImportStock extends BuildTask
 {
@@ -31,8 +32,10 @@ class ImportStock extends BuildTask
         $run = true;
         $page = 1;
         while($run) {
+            Log::printLn('Querying stock page ' . $page);
             $products = $conn->getStocks($page, $config->StockLastImported);
             foreach ($products as $product) {
+                Log::printLn('Importing stock');
                 $loader->load($product);
             }
             $page += 1;

@@ -8,6 +8,7 @@ use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripers\Cin7\Connector\Cin7Connector;
 use SilverStripers\Cin7\Connector\Loader\ProductLoader;
+use SilverStripers\Out\System\Log;
 
 class ImportProducts extends BuildTask
 {
@@ -30,8 +31,10 @@ class ImportProducts extends BuildTask
         $run = true;
         $page = 1;
         while($run) {
+            Log::printLn('Querying product page: ' . $page);
             $products = $conn->getProducts($page, $config->ProductLastImported);
             foreach ($products as $product) {
+                Log::printLn('Imported product ' . $data['id']);
                 $loader->load($product);
             }
             $page += 1;

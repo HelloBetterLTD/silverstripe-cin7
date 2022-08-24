@@ -6,9 +6,12 @@ use SilverShop\Model\Variation\Variation;
 use SilverShop\Page\Product;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\BuildTask;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
 use SilverStripers\Cin7\Connector\Cin7Connector;
 use SilverStripers\Cin7\Connector\Loader\ProductLoader;
+use SilverStripers\Out\System\Log;
 
 class ImportPurchaseOrders extends BuildTask
 {
@@ -22,36 +25,53 @@ class ImportPurchaseOrders extends BuildTask
 
     public function run($request)
     {
+        set_time_limit(0);
+        $config = SiteConfig::current_site_config();
         $stage = Versioned::get_stage();
         Versioned::set_stage(Versioned::DRAFT);
         $conn = Cin7Connector::init();
-        $page = $request && $request->getVar('page') ? $request->getVar('page') : 0;
-        $pos = $conn->getPurchaseOrders($page);
-        foreach ($pos as $po) {
-            $etd = $po['estimatedDeliveryDate'];
-            if (!$etd && $po['estimatedArrivalDate']) {
-                $etd = $po['estimatedArrivalDate'];
-            }
-            if ($etd) {
-                foreach ($po['lineItems'] as $lineItem) {
-                    $product = null;
-                    if ($lineItem['productId'] && $lineItem['productOptionId']) {
-                        $product = Variation::get()->find('ExternalID', $lineItem['productOptionId']);
-                    } else {
-                        $product = Product::get()->find('ExternalID', $lineItem['productId']);
-                    }
 
-                    if ($product) {
-                        $product->NewStockETD = $conn->cin7DateToDt($etd);
-                        $product->NewStockQty = $lineItem['qty'];
-                        $product->write();
-                        if ($product->isPublished()) { // publish only previously published products
-                            $product->publishRecursive();
+        $run = true;
+        $page = 1;
+        while($run) {
+            Log::printLn('Querying purchase orders page: ' . $page);
+            $pos = $conn->getPurchaseOrders($page, $config->POLastImported);
+
+            foreach ($pos as $po) {
+                $etd = $po['estimatedDeliveryDate'];
+                if (!$etd && $po['estimatedArrivalDate']) {
+                    $etd = $po['estimatedArrivalDate'];
+                }
+                if ($etd) {
+                    foreach ($po['lineItems'] as $lineItem) {
+                        $product = null;
+                        if ($lineItem['productId'] && $lineItem['productOptionId']) {
+                            $product = Variation::get()->find('ExternalID', $lineItem['productOptionId']);
+                        } else {
+                            $product = Product::get()->find('ExternalID', $lineItem['productId']);
+                        }
+
+                        if ($product) {
+                            $product->NewStockETD = $conn->cin7DateToDt($etd);
+                            $product->NewStockQty = $lineItem['qty'];
+                            $product->write();
+                            if ($product->isPublished()) { // publish only previously published products
+                                $product->publishRecursive();
+                            }
                         }
                     }
                 }
             }
+
+            $page += 1;
+            sleep(2); // obey the throttle
+            if (count($pos) < 20) {
+                $run = false;
+            }
         }
+
+        $config->POLastImported = DBDatetime::now()->getValue();
+        $config->write();
         Versioned::set_stage($stage);
     }
 
