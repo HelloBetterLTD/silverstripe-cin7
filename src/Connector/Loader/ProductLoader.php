@@ -93,15 +93,15 @@ class ProductLoader extends Loader
         /* @var $product Product */
         $product = $this->findProduct($data);
         if ($this->canImportProduct($data)) {
-            Log::printLn('Can import product ' . $product['id']);
+            Log::printLn('Can import product ' . $data['id']);
             $this->isNew = false;
             if (!$product) {
                 $this->isNew = true;
                 $product = $this->createNewProduct($data);
-                Log::printLn('Created new product for ' . $product['id']);
+                Log::printLn('Created new product for ' . $data['id']);
             }
             if ($force || $product->ExternalHash != $this->getHash($data)) {
-                Log::printLn('Imported products ' . $product['id']);
+                Log::printLn('Importing product ' . $data['id']);
                 $this->assignCategoriesToProduct($data, $product);
                 $this->importBasicData($data, $product);
                 $this->processVariations($data, $product);
