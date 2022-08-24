@@ -81,30 +81,19 @@ class Cin7Connector
         return $this->get(self::PRODUCT_CATEGORIES_ENDPOINT, ['rows' => 250]); // TODO: pagination
     }
 
-    public function getProducts() : array
+    public function getProducts($page = 1, $lastImported = null) : array
     {
-        $config = SiteConfig::current_site_config();
-
         $params = [
             'rows' => 20,
-            'page' => $config->CurrentProductPage ?: 1
+            'page' => $page ? : 1
         ];
-        if ($config->ProductLastImported) {
+        if ($lastImported) {
             $params['where'] = sprintf(
                 "modifiedDate>='%s'",
-                $this->dateToCin7Date($config->ProductLastImported)
+                $this->dateToCin7Date($lastImported)
             );
         }
-
         $response = $this->get(self::PRODUCTS_ENDPOINT, $params);
-
-        if (empty($response)) {
-            $config->CurrentProductPage = 1;
-            $config->ProductLastImported = DBDatetime::now()->getValue();
-        } else {
-            $config->CurrentProductPage += 1;
-        }
-        $config->write();
         return $response;
     }
 
@@ -188,29 +177,45 @@ class Cin7Connector
         return 0;
     }
 
-    public function getStocks()
+    public function getStocks($page = 1, $lastImported = null)
     {
-        $config = SiteConfig::current_site_config();
         $params = [
             'rows' => 250,
-            'page' => $config->CurrentStockPage ?: 1
+            'page' => $page ?: 1
         ];
-        if ($config->StockLastImported) {
+        if ($lastImported) {
             $params['where'] = sprintf(
                 "modifiedDate>='%s'",
-                $this->dateToCin7Date($config->StockLastImported)
+                $this->dateToCin7Date($lastImported)
             );
         }
         $response = $this->get(self::STOCK_ENDPOINT, $params);
-        if (empty($response)) {
-            $config->CurrentStockPage = 1;
-            $config->StockLastImported = DBDatetime::now()->getValue();
-        } else {
-            $config->CurrentStockPage += 1;
-        }
-        $config->write();
         return $response;
     }
+
+//    public function getStocks()
+//    {
+//        $config = SiteConfig::current_site_config();
+//        $params = [
+//            'rows' => 250,
+//            'page' => $config->CurrentStockPage ?: 1
+//        ];
+//        if ($config->StockLastImported) {
+//            $params['where'] = sprintf(
+//                "modifiedDate>='%s'",
+//                $this->dateToCin7Date($config->StockLastImported)
+//            );
+//        }
+//        $response = $this->get(self::STOCK_ENDPOINT, $params);
+//        if (empty($response)) {
+//            $config->CurrentStockPage = 1;
+//            $config->StockLastImported = DBDatetime::now()->getValue();
+//        } else {
+//            $config->CurrentStockPage += 1;
+//        }
+//        $config->write();
+//        return $response;
+//    }
 
     public function syncOrder(Order $order)
     {
