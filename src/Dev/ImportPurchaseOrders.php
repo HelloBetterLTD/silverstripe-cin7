@@ -23,6 +23,8 @@ class ImportPurchaseOrders extends BuildTask
 
     protected $description = 'Import Product Availability Dates from incoming purchase orders';
 
+    private static $delay = 30;
+
     public function run($request)
     {
         set_time_limit(0);
@@ -64,7 +66,7 @@ class ImportPurchaseOrders extends BuildTask
             }
 
             $page += 1;
-            sleep(2); // obey the throttle
+            sleep(self::config()->get('delay')); // obey the throttle
             if (count($pos) < 20) {
                 $run = false;
             }

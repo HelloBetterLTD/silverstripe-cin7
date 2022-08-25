@@ -20,6 +20,8 @@ class ImportProducts extends BuildTask
 
     protected $description = 'Import Products';
 
+    private static $delay = 30;
+
     public function run($request)
     {
         set_time_limit(0);
@@ -39,7 +41,7 @@ class ImportProducts extends BuildTask
                 $loader->load($product);
             }
             $page += 1;
-            sleep(2); // obey the throttle
+            sleep(self::config()->get('delay')); // obey the throttle
             if (count($products) < 20) {
                 $run = false;
             }
