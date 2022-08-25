@@ -11,6 +11,7 @@ use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripers\Out\System\Log;
 
 class Cin7Connector
 {
@@ -126,7 +127,9 @@ class Cin7Connector
             $response = $this->getClient()->get($path, $params);
             $json = $response->getBody()->getContents();
             return json_decode($json, true);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            Log::printLn($e->getMessage());
+        }
         return [];
     }
 
@@ -142,7 +145,7 @@ class Cin7Connector
             $json = $response->getBody()->getContents();
             return json_decode($json, true);
         } catch (\Exception $e) {
-            echo $e->getMessage();
+            Log::printLn($e->getMessage());
         }
         return [];
     }
@@ -155,7 +158,9 @@ class Cin7Connector
             ]);
             $json = $response->getBody()->getContents();
             return json_decode($json, true);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            Log::printLn($e->getMessage());
+        }
         return [];
     }
 
@@ -192,30 +197,6 @@ class Cin7Connector
         $response = $this->get(self::STOCK_ENDPOINT, $params);
         return $response;
     }
-
-//    public function getStocks()
-//    {
-//        $config = SiteConfig::current_site_config();
-//        $params = [
-//            'rows' => 250,
-//            'page' => $config->CurrentStockPage ?: 1
-//        ];
-//        if ($config->StockLastImported) {
-//            $params['where'] = sprintf(
-//                "modifiedDate>='%s'",
-//                $this->dateToCin7Date($config->StockLastImported)
-//            );
-//        }
-//        $response = $this->get(self::STOCK_ENDPOINT, $params);
-//        if (empty($response)) {
-//            $config->CurrentStockPage = 1;
-//            $config->StockLastImported = DBDatetime::now()->getValue();
-//        } else {
-//            $config->CurrentStockPage += 1;
-//        }
-//        $config->write();
-//        return $response;
-//    }
 
     public function syncOrder(Order $order)
     {
@@ -275,33 +256,6 @@ class Cin7Connector
         $response = $this->get(self::PURCHASE_ORDERS, $params);
         return $response;
     }
-
-//    public function getPurchaseOrders($page = 0)
-//    {
-//        $params = [];
-//        $config = SiteConfig::current_site_config();
-//        if ($page) {
-//            $params['page'] = $page;
-//        } else {
-//            $params['page'] = $config->CurrentPOPage == 0 ? 1 : $config->CurrentPOPage;
-//        }
-//        if ($config->POLastImported) {
-//            $params['where'] = sprintf(
-//                "modifiedDate>='%s'",
-//                $this->dateToCin7Date($config->POLastImported)
-//            );
-//        }
-//
-//        $response = $this->get(self::PURCHASE_ORDERS, $params);
-//        if (empty($response)) {
-//            $config->CurrentPOPage = 1;
-//            $config->POLastImported = DBDatetime::now()->getValue();
-//        } else {
-//            $config->CurrentPOPage += 1;
-//        }
-//        $config->write();
-//        return $response;
-//    }
 
     public function cin7DateToDt($date)
     {
