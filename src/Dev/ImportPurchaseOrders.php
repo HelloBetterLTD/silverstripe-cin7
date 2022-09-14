@@ -11,6 +11,8 @@ use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
 use SilverStripers\Cin7\Connector\Cin7Connector;
 use SilverStripers\Cin7\Connector\Loader\ProductLoader;
+use SilverStripers\Cin7\Model\PurchaseOrder;
+use SilverStripers\Cin7\Model\PurchaseOrderLineItem;
 use SilverStripers\Out\System\Log;
 
 class ImportPurchaseOrders extends BuildTask
@@ -24,6 +26,7 @@ class ImportPurchaseOrders extends BuildTask
     protected $description = 'Import Product Availability Dates from incoming purchase orders';
 
     private static $delay = 30;
+
 
     public function run($request)
     {
@@ -40,26 +43,67 @@ class ImportPurchaseOrders extends BuildTask
             $pos = $conn->getPurchaseOrders($page, $config->POLastImported);
 
             foreach ($pos as $po) {
+                $id = $po['id'];
+                $hash = md5(json_encode($po));
+                $order = PurchaseOrder::get()->find('ExternalID', $id);
+
                 $etd = $po['estimatedDeliveryDate'];
                 if (!$etd && $po['estimatedArrivalDate']) {
                     $etd = $po['estimatedArrivalDate'];
                 }
-                if ($etd) {
-                    foreach ($po['lineItems'] as $lineItem) {
-                        $product = null;
-                        if ($lineItem['productId'] && $lineItem['productOptionId']) {
-                            $product = Variation::get()->find('ExternalID', $lineItem['productOptionId']);
-                        } else {
-                            $product = Product::get()->find('ExternalID', $lineItem['productId']);
+
+                if (!$order || $order->ExternalHash != $hash) {
+
+                    if (!$order) {
+                        $order = new PurchaseOrder();
+                    }
+                    $order->update([
+                        'ExternalHash' => $hash,
+                        'ExternalID' => $po['id'],
+                        'Reference' => $po['id'],
+                        'Status' => $po['id'],
+                        'Stage' => $po['id']
+                    ]);
+
+                    if ($etd) {
+                        $order->EDT = $conn->cin7DateToDt($etd);
+                    }
+                    $order->write();
+
+
+                    foreach ($po['lineItems'] as $li) {
+
+                        $variation = null;
+                        $product = Product::get()->find('ExternalID', $li['productId']);
+                        if ($li['productId'] && $li['productOptionId'] && $li['sizeCodes']) {
+                            $codes = explode('|', $li['sizeCodes']);
+                            foreach ($codes as $code) {
+                                $variation = Variation::get()->find('ExternalID', $li['productOptionId'] . '//' . $code);
+                                if ($variation) {
+                                    break;
+                                }
+                            }
                         }
 
                         if ($product) {
-                            $product->NewStockETD = $conn->cin7DateToDt($etd);
-                            $product->NewStockQty = $lineItem['qty'];
-                            $product->write();
-                            if ($product->isPublished()) { // publish only previously published products
-                                $product->publishRecursive();
+
+                            $item = PurchaseOrderLineItem::get()
+                                ->filter([
+                                    'ExternalID' => $li['id'],
+                                    'PurchaseOrderID' => $order->ID
+                                ])->first();
+
+                            if (!$item) {
+                                $item = new PurchaseOrderLineItem();
                             }
+                            $item->update([
+                                'ExternalID' => $li['id'],
+                                'PurcahseOrderID' => $order->ID,
+                                'Product' => $product ? $product->ID : 0,
+                                'Variation' => $variation ? $variation->ID : 0,
+                                'Quantity' => $li['qty']
+                            ]);
+                            $item->write();
                         }
                     }
                 }

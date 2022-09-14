@@ -27,7 +27,6 @@ class ImportStock extends BuildTask
         set_time_limit(0);
         $conn = Cin7Connector::init();
         $config = SiteConfig::current_site_config();
-        $stocks = $conn->getStocks();
         /* @var $loader StockLoader */
         $loader = Injector::inst()->get(StockLoader::class);
 
@@ -35,14 +34,14 @@ class ImportStock extends BuildTask
         $page = 1;
         while($run) {
             Log::printLn('Querying stock page ' . $page);
-            $products = $conn->getStocks($page, $config->StockLastImported);
-            foreach ($products as $product) {
-                Log::printLn('Importing stock');
-                $loader->load($product);
+            $stocks = $conn->getStocks($page, $config->StockLastImported);
+            foreach ($stocks as $stock) {
+                $loader->load($stock);
             }
+            Log::printLn('Finished import stock page ' . $page);
             $page += 1;
             sleep(self::config()->get('delay')); // obey the throttle
-            if (count($products) < 250) {
+            if (count($stocks) < 250) {
                 $run = false;
             }
         }
