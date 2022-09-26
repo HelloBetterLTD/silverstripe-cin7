@@ -31,6 +31,7 @@ class Config extends DataExtension
 
         'CurrentPOPage' => 'Int',
         'POLastImported' => 'Datetime',
+        'OrdersLastImported' => 'Datetime',
 
         'SyncOrdersToAPI' => 'Boolean'
     ];

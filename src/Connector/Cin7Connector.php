@@ -272,8 +272,19 @@ class Cin7Connector
         );
     }
 
-    public function getOrders()
+    public function getOrders($rows = 250, $page = 1, $date = null)
     {
-        return $this->get(self::GET_SALES_ORDERS);
+        $params = [
+            'rows' => $rows,
+            'page' => $page
+        ];
+
+        if ($date) {
+            $params['where'] = sprintf(
+                "modifiedDate>='%s'",
+                $this->dateToCin7Date($date)
+            );
+        }
+        return $this->get(self::GET_SALES_ORDERS, $params);
     }
 }

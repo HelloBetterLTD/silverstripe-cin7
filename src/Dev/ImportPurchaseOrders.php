@@ -43,7 +43,6 @@ class ImportPurchaseOrders extends BuildTask
         $fetched = false;
 
         while($run) {
-            $fetched = false;
             Log::printLn('Querying purchase orders page: ' . $page);
             $pos = $conn->getPurchaseOrders($page, $config->POLastImported);
             if (count($pos)) {
