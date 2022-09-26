@@ -6,11 +6,13 @@ use SilverShop\Model\Variation\Variation;
 use SilverShop\Page\Product;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\BuildTask;
+use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
 use SilverStripers\Cin7\Connector\Cin7Connector;
 use SilverStripers\Cin7\Connector\Loader\ProductLoader;
+use SilverStripers\Cin7\Extension\AttributeTypeExtension;
 use SilverStripers\Cin7\Model\PurchaseOrder;
 use SilverStripers\Cin7\Model\PurchaseOrderLineItem;
 use SilverStripers\Out\System\Log;
@@ -38,72 +40,82 @@ class ImportPurchaseOrders extends BuildTask
 
         $run = true;
         $page = 1;
+        $fetched = false;
+
         while($run) {
+            $fetched = false;
             Log::printLn('Querying purchase orders page: ' . $page);
             $pos = $conn->getPurchaseOrders($page, $config->POLastImported);
+            if (count($pos)) {
+                $fetched = true;
+                foreach ($pos as $po) {
+                    $id = $po['id'];
+                    $hash = md5(json_encode($po));
+                    $order = PurchaseOrder::get()->find('ExternalID', $id);
 
-            foreach ($pos as $po) {
-                $id = $po['id'];
-                $hash = md5(json_encode($po));
-                $order = PurchaseOrder::get()->find('ExternalID', $id);
-
-                $etd = $po['estimatedDeliveryDate'];
-                if (!$etd && $po['estimatedArrivalDate']) {
-                    $etd = $po['estimatedArrivalDate'];
-                }
-
-                if (!$order || $order->ExternalHash != $hash) {
-
-                    if (!$order) {
-                        $order = new PurchaseOrder();
+                    $etd = $po['estimatedDeliveryDate'];
+                    if (!$etd && $po['estimatedArrivalDate']) {
+                        $etd = $po['estimatedArrivalDate'];
                     }
-                    $order->update([
-                        'ExternalHash' => $hash,
-                        'ExternalID' => $po['id'],
-                        'Reference' => $po['id'],
-                        'Status' => $po['id'],
-                        'Stage' => $po['id']
-                    ]);
 
-                    if ($etd) {
-                        $order->EDT = $conn->cin7DateToDt($etd);
-                    }
-                    $order->write();
+                    if (!$order || $order->ExternalHash != $hash) {
+
+                        if (!$order) {
+                            $order = new PurchaseOrder();
+                        }
+                        $order->update([
+                            'ExternalHash' => $hash,
+                            'ExternalID' => $po['id'],
+                            'Reference' => $po['id'],
+                            'Status' => $po['id'],
+                            'Stage' => $po['id']
+                        ]);
+
+                        if ($etd) {
+                            $order->EDT = $conn->cin7DateToDt($etd);
+                        }
+                        $order->write();
 
 
-                    foreach ($po['lineItems'] as $li) {
+                        foreach ($po['lineItems'] as $li) {
+                            $product = Product::get()->find('ExternalID', $li['productId']);
+                            if (!empty($li['option1']) && !empty($li['option3']) && $product) {
+                                $color = AttributeTypeExtension::find_or_make_color_attribute($li['option1']);
+                                $contents = explode("\n", $li['option3']);
 
-                        $variation = null;
-                        $product = Product::get()->find('ExternalID', $li['productId']);
-                        if ($li['productId'] && $li['productOptionId'] && $li['sizeCodes']) {
-                            $codes = explode('|', $li['sizeCodes']);
-                            foreach ($codes as $code) {
-                                $variation = Variation::get()->find('ExternalID', $li['productOptionId'] . '//' . $code);
-                                if ($variation) {
-                                    break;
+
+                                foreach ($contents as $contentItem) {
+                                    $item = PurchaseOrderLineItem::get()
+                                        ->filter([
+                                            'ExternalID' => $li['id'],
+                                            'IdentifierData' => $contentItem,
+                                            'PurchaseOrderID' => $order->ID
+                                        ])->first();
+
+                                    $parts = explode(' x ', $contentItem);
+                                    $size = AttributeTypeExtension::find_or_make_size_attribute($parts[1]);
+
+                                    $variation = Variation::get()
+                                        ->filter([
+                                            'ProductID' => $product->ID,
+                                            'ExternalID' => $li['productOptionId'] . '//' . trim($parts[1])
+                                        ])->first();
+
+                                    if (!$item) {
+                                        $item = new PurchaseOrderLineItem();
+                                    }
+
+                                    $item->update([
+                                        'ExternalID' => $li['id'],
+                                        'IdentifierData' => $contentItem,
+                                        'PurchaseOrderID' => $order->ID,
+                                        'ProductID' => $product ? $product->ID : 0,
+                                        'VariationID' => $variation ? $variation->ID : 0,
+                                        'Quantity' => $parts[0]
+                                    ]);
+                                    $item->write();
                                 }
                             }
-                        }
-
-                        if ($product) {
-
-                            $item = PurchaseOrderLineItem::get()
-                                ->filter([
-                                    'ExternalID' => $li['id'],
-                                    'PurchaseOrderID' => $order->ID
-                                ])->first();
-
-                            if (!$item) {
-                                $item = new PurchaseOrderLineItem();
-                            }
-                            $item->update([
-                                'ExternalID' => $li['id'],
-                                'PurcahseOrderID' => $order->ID,
-                                'Product' => $product ? $product->ID : 0,
-                                'Variation' => $variation ? $variation->ID : 0,
-                                'Quantity' => $li['qty']
-                            ]);
-                            $item->write();
                         }
                     }
                 }
@@ -111,13 +123,17 @@ class ImportPurchaseOrders extends BuildTask
 
             $page += 1;
             sleep(self::config()->get('delay')); // obey the throttle
+
+
             if (count($pos) < 20) {
                 $run = false;
             }
         }
 
-        $config->POLastImported = DBDatetime::now()->getValue();
-        $config->write();
+        if ($fetched) {
+            $config->POLastImported = DBDatetime::now()->getValue();
+            $config->write();
+        }
         Versioned::set_stage($stage);
     }
 

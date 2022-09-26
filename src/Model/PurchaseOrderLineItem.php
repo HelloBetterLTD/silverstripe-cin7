@@ -10,6 +10,7 @@ class PurchaseOrderLineItem extends DataObject
 
     private static $db = [
         'ExternalID' => 'Int',
+        'IdentifierData' => 'Varchar',
         'Quantity' => 'Int'
     ];
 
