@@ -64,7 +64,9 @@ class Cin7Connector
         if (!$this->client) {
             $this->client = new Client([
                 'base_uri' => self::API_BASE,
-                'timeout' => 2.0,
+                'timeout' => 30,
+                'read_timeout' => 30,
+                'connect_timeout' => 30,
                 'auth' => [
                     $this->username,
                     $this->password
@@ -203,10 +205,11 @@ class Cin7Connector
         $data = $order->toCin7();
         if (!$order->ExternalID) {
             $response = $this->post(self::POST_ORDER, json_encode($data));
+            $order->SyncResponse = $response;
             if ($response) {
                 $order->ExternalID = $response[0]['id'];
-                $order->write();
             }
+            $order->write();
         } else {
             return $this->put(self::POST_ORDER, json_encode($data));
         }
@@ -259,7 +262,12 @@ class Cin7Connector
 
     public function cin7DateToDt($date)
     {
-        return str_replace('Z', '', str_replace('T', ' ', $date));
+        $dt = new \DateTime(
+            str_replace('Z', '', str_replace('T', ' ', $date)),
+            new \DateTimeZone('UTC')
+        );
+        $dt->setTimezone(new \DateTimeZone('Pacific/Auckland'));
+        return $dt->format('Y-m-d H:i:s');
     }
 
     public function dateToCin7Date($date)

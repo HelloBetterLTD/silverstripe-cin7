@@ -16,7 +16,8 @@ class OrderExtension extends DataExtension
     private static $db = [
         'ExternalID' => 'Varchar',
         'ForceCin7Sync' => 'Boolean',
-        'PurchaseOrderNumber' => 'Varchar'
+        'PurchaseOrderNumber' => 'Varchar',
+        'SyncResponse' => 'Text'
     ];
 
     private static $has_one = [
@@ -195,7 +196,7 @@ class OrderExtension extends DataExtension
             'billingState' => $billing->State,
             'billingCountry' => $billing->Country,
 
-            
+
             'branchId' => $order->Branch()->exists() ? $order->Branch()->ExternalID : null,
             'branchEmail' => null,
             'projectName' => null,
