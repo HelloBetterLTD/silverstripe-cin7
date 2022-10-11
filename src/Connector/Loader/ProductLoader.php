@@ -69,7 +69,9 @@ class ProductLoader extends Loader
     {
         $ids = $data['categoryIdArray'];
         $mainCategoryID = $this->findMainCategoryID($ids);
-        $product->ParentID = $this->findShopCategoryId($mainCategoryID);
+        if ($this->isNew) {
+            $product->ParentID = $this->findShopCategoryId($mainCategoryID);
+        }
         foreach ($ids as $id) {
             if ($shopId = $this->findShopCategoryId($id)) {
                 $product->ProductCategories()->add($shopId);
