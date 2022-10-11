@@ -273,11 +273,12 @@ class Cin7Connector
     public function dateToCin7Date($date)
     {
         $dt = strtotime($date);
-        return sprintf(
-            '%sT%sZ',
-            date('Y-m-d', $dt),
-            date('H:i:s', $dt)
-        );
+        return gmdate('Y-m-d\TH:i:s\Z', $dt);
+//        return sprintf(
+//            '%sT%sZ',
+//            date('Y-m-d', $dt),
+//            date('H:i:s', $dt)
+//        );
     }
 
     public function getOrders($rows = 250, $page = 1, $date = null)
