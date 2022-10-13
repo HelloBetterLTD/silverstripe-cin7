@@ -39,13 +39,11 @@ class ImportPurchaseOrders extends BuildTask
 
         $run = true;
         $page = 1;
-        $fetched = false;
 
         while($run) {
             Log::printLn('Querying purchase orders page: ' . $page);
             $pos = $conn->getPurchaseOrders($page, $config->POLastImported);
             if (count($pos)) {
-                $fetched = true;
                 foreach ($pos as $po) {
                     $id = $po['id'];
                     $hash = md5(json_encode($po));
@@ -122,16 +120,15 @@ class ImportPurchaseOrders extends BuildTask
             $page += 1;
             sleep(self::config()->get('delay')); // obey the throttle
 
-
             if (count($pos) < 20) {
                 $run = false;
             }
         }
 
-        if ($fetched) {
-            $config->POLastImported = DBDatetime::now()->getValue();
-            $config->write();
-        }
+
+        $config->POLastImported = DBDatetime::now()->getValue();
+        $config->write();
+
         Versioned::set_stage($stage);
     }
 
