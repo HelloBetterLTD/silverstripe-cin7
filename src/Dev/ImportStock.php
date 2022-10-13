@@ -13,7 +13,6 @@ use SilverStripers\Out\System\Log;
 class ImportStock extends BuildTask
 {
 
-    //CurrentProductPage
     private static $segment = 'cin7-stock-import';
 
     protected $title = 'Cin7:Import Stocks';

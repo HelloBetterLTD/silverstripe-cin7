@@ -20,7 +20,6 @@ use SilverStripers\Out\System\Log;
 class ImportPurchaseOrders extends BuildTask
 {
 
-    //CurrentProductPage
     private static $segment = 'cin7-purchase-orders-import';
 
     protected $title = 'Cin7:Import Product Availability Dates';
