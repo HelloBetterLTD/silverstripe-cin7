@@ -86,7 +86,7 @@ class ProductLoader extends Loader
         $categories = ProductCategory::get()
             ->filter('ExternalID', $ids)
             ->where('ProductCategoryID > 0');
-        return !empty($data['status']) && $data['status'] == 'Public' && $categories->count() > 0;
+        return !empty($data['status']) && $data['status'] == 'Public'; // && $categories->count() > 0;
     }
 
 

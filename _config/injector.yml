@@ -1,3 +1,7 @@
+SilverStripe\Core\Injector\Injector:
+  SilverShop\Forms\GridField\ProductGridFieldDetailForm_ItemRequest:
+    class:
+      SilverStripers\Cin7\Form\Request\ProductGrid_ItemRequest
 #SilverStripe\Core\Injector\Injector:
 #  SilverShop\Model\Variation\AttributeType:
 #    class: SilverStripers\Cin7\Model\AttributeType

@@ -85,7 +85,12 @@ class ProductExtension extends DataExtension
 
     public function updateCMSActions(FieldList $fields)
     {
-        $fields->insertAfter('publish', FormAction::create('doSync', 'Sync with Cin7'));
+        $fields->insertAfter(
+            'action_publish',
+            FormAction::create('doSyncWithAPI', 'Sync with Cin7')
+                ->addExtraClass('btn btn-outline-primary')
+                ->setUseButtonTag(true)
+        );
     }
 
 }

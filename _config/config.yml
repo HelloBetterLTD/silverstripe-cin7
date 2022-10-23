@@ -40,3 +40,7 @@ SilverShop\Model\Variation\AttributeType:
 SilverShop\Admin\ProductCatalogAdmin:
   extensions:
     - SilverStripers\Cin7\Extension\ProductCatalogAdminExtension
+
+SilverStripe\CMS\Controllers\CMSMain:
+  extensions:
+    - SilverStripers\Cin7\Extension\CMSMainExtension

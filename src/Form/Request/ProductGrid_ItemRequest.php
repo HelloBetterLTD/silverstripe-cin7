@@ -2,6 +2,7 @@
 
 namespace SilverStripers\Cin7\Form\Request;
 
+use SilverShop\Forms\GridField\ProductGridFieldDetailForm_ItemRequest;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use SilverStripe\ORM\ValidationResult;
@@ -9,7 +10,7 @@ use SilverStripe\Versioned\VersionedGridFieldItemRequest;
 use SilverStripers\Cin7\Connector\Cin7Connector;
 use SilverStripers\Cin7\Connector\Loader\ProductLoader;
 
-class ProductGrid_ItemRequest extends VersionedGridFieldItemRequest
+class ProductGrid_ItemRequest extends ProductGridFieldDetailForm_ItemRequest
 {
 
     private static $allowed_actions = [
@@ -25,6 +26,7 @@ class ProductGrid_ItemRequest extends VersionedGridFieldItemRequest
                 ->push(
                     FormAction::create('doSyncWithAPI', 'Sync with Cin7')
                         ->addExtraClass('btn btn-outline-primary')
+                        ->setUseButtonTag(true)
                 );
         }
         return $form;
