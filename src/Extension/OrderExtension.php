@@ -165,7 +165,7 @@ class OrderExtension extends DataExtension
             'processedBy' => null,
             'isApproved' => true,
             'reference' => $order->Reference,
-            'memberId' => '',
+            'memberId' => $member->exists() && $member->ExternalID ? $member->ExternalID : '',
             'memberEmail' => $member->exists() ? $member->Email : $order->Email,
             'firstName' => $member->exists() ? $member->FirstName : $order->FirstName,
             'lastName' => $member->exists() ? $member->Surname : $order->Surname,
