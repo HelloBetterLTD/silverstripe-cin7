@@ -210,8 +210,14 @@ class Cin7Connector
                 $order->ExternalID = $response[0]['id'];
             }
             $order->write();
+
+            $order->extend('onAfterSyncOrder', $response);
+
+            return $response;
         } else {
-            return $this->put(self::POST_ORDER, json_encode($data));
+            $response = $this->put(self::POST_ORDER, json_encode($data));
+            $order->extend('onAfterSyncOrder', $response);
+            return $response;
         }
     }
 
