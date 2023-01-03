@@ -134,7 +134,8 @@ class ProductLoader extends Loader
             'Model' => $data['styleCode'],
             'Content' => $data['description'],
             'StyleCode' => $data['styleCode'],
-            'Cin7Categories' => implode(',', $data['categoryIdArray']),
+            'Cin7Categories' => !empty($data['categoryIdArray']) && is_array($data['categoryIdArray']) ?
+                implode(',', $data['categoryIdArray']) : $data['categoryIdArray'],
             'CustomFields' => json_encode(!empty($data['customFields']) ? $data['customFields'] : []),
         ]);
         $product->write();
