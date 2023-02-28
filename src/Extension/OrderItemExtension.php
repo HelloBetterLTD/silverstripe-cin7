@@ -10,6 +10,11 @@ use SilverStripers\Cin7\Model\PriceOption;
 class OrderItemExtension extends DataExtension
 {
 
+    private static $db = [
+        'MemberPriceColumn' => 'Varchar',
+        'AppliedPriceColumn' => 'Varchar'
+    ];
+
     public function updateUnitPrice(&$price)
     {
         /* @var $owner OrderItem */
@@ -28,8 +33,9 @@ class OrderItemExtension extends DataExtension
             $priceOptions = PriceOption::get();
             $matchedPriceOptions = null;
             if ($member && $member->exists()) {
-                if ($member->getAffectedPriceColumn()) {
-                    $matchedPriceOptions = $priceOptions->filter('Label', $member->getAffectedPriceColumn());
+                if ($col = $member->getAffectedPriceColumn()) {
+                    $owner->MemberPriceColumn = $col;
+                    $matchedPriceOptions = $priceOptions->filter('Label', $col);
                 } else {
                     $groups = implode(',', array_merge([-1], $member->DirectGroups()->column('ID')));
                     $matchedPriceOptions = $priceOptions->where('(
@@ -62,6 +68,7 @@ class OrderItemExtension extends DataExtension
                             $can = false;
                         }
                         if ($can) {
+                            $owner->AppliedPriceColumn = $priceOption->Label;
                             $price = $priceOptionPrice->Price;
                             break;
                         }
@@ -72,6 +79,8 @@ class OrderItemExtension extends DataExtension
                     ->Prices()
                     ->find('PriceOption.ID', $defaultPrice->ID);
                 if ($priceItem) {
+                    $owner->MemberPriceColumn = '';
+                    $owner->AppliedPriceColumn = $defaultPrice->Label;
                     $price = $priceItem->Price;
                 }
             }
