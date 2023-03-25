@@ -57,7 +57,6 @@ class MemberExtension extends DataExtension
     {
         $member = $this->owner;
         $connector = Cin7Connector::init();
-        $this->owner->invokeWithExtensions('updateMemberToSync', $member);
         return $connector->copyMember($member);
     }
 

@@ -242,10 +242,21 @@ class Cin7Connector
         if ($member->ExternalID) {
             $response = $this->get(self::POST_CONTACTS . '/' . $member->ExternalID);
             $member->Cin7Data = json_encode($response);
-            if ($response && array_key_exists('priceColumn', $response)) {
-                $member->PriceColumn = $response['priceColumn'];
+            if ($response) {
+                $map = [
+                    'priceColumn' => 'PriceColumn',
+                    'company' => 'Company',
+                    'phone' => 'PhoneNumber',
+                    'mobile' => 'Mobile',
+                ];
+                foreach ($map as $cin7Field => $ssField) {
+                    if (!empty($response[$cin7Field])) {
+                        $member->setField($ssField, $response[$cin7Field]);
+                    }
+                }
+                $member->invokeWithExtensions('updateCopyMember', $response);
+                $member->write();
             }
-            $member->write();
         }
         return $member;
     }
