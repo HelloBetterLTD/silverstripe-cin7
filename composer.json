@@ -10,10 +10,10 @@
         "email": "nivanka@silverstripers.com"
     }],
     "require": {
-        "silverstripe/framework": "^4.10",
-        "silverstripe/cms": "^4.10",
-        "silvershop/core": "^3.0",
-        "tractorcow/silverstripe-autocomplete": "4.0.0",
+        "silverstripe/framework": "4.* | 5.*",
+        "silverstripe/cms": "4.* | 5.*",
+        "silvershop/core": "4.* | 5.*",
+        "tractorcow/silverstripe-autocomplete": "*",
         "silverstripers/out": "*"
     },
     "extra": {
