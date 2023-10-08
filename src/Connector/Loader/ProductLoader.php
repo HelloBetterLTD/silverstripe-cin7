@@ -72,11 +72,19 @@ class ProductLoader extends Loader
         if ($this->isNew) {
             $product->ParentID = $this->findShopCategoryId($mainCategoryID);
         }
+
+        $currentCategoryIds = $product->ProductCategories()->map('ID', 'ID')->toArray();
         foreach ($ids as $id) {
             if ($shopId = $this->findShopCategoryId($id)) {
                 $product->ProductCategories()->add($shopId);
+                unset($currentCategoryIds[$shopId]);
             }
         }
+
+        foreach ($currentCategoryIds as $currentCategoryId) {
+            $product->ProductCategories()->removeByID($currentCategoryId);
+        }
+
         return $product;
     }
 
