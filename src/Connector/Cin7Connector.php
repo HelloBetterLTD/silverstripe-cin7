@@ -289,8 +289,12 @@ class Cin7Connector
 
     public function dateToCin7Date($date)
     {
-        $dt = strtotime($date);
-        return gmdate('Y-m-d\TH:i:s\Z', $dt);
+        $dt = new \DateTime($date);
+        $cin7Date = $dt->format('Y-m-d\TH:i:s') . '+12:00';
+        return $cin7Date;
+        
+        // $dt = strtotime($date);
+        // return gmdate('Y-m-d\TH:i:s\Z', $dt);
     }
 
     public function getOrders($rows = 250, $page = 1, $date = null)
