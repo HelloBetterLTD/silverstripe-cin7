@@ -7,32 +7,27 @@ use SilverStripe\Core\Extension;
 class DatetimeExtension extends Extension
 {
 
+    public static function get_offset()
+    {
+        $offset = date('Z');
+        $hours = ($offset / 3600);
+        $h = str_pad(intval($hours), 2, '0', STR_PAD_LEFT);
+        $m = str_pad(($hours - intval($hours)) * 60, 2, '0', STR_PAD_LEFT);
+        return sprintf(
+            '%s%s:%s',
+            $hours > 0 ? '+' : '-',
+            $h,
+            $m
+        );
+    }
+
     public function Cin7Date()
     {
         $dateString = $this->owner->Value;
         $date = new \DateTime($dateString);
-        $cin7Date = $date->format('Y-m-d\TH:i:s') . '+12:00';
+        $offset = self::get_offset();
+        $cin7Date = $date->format('Y-m-d\TH:i:s') . $offset;
         return $cin7Date;
-
-        
-        // $time = $this->owner->Value;
-        // $nzst = new \DateTimeZone('Pacific/Auckland');
-        // $utc = new \DateTimeZone('UTC');
-        // $dateNZ = new \DateTime($time, $nzst);
-        // $dateUTC = $dateNZ->setTimezone($utc);
-        // $utcDate = sprintf(
-        //     '%sT%s+12:00',
-        //     $dateUTC->format('Y-m-d'),
-        //     $dateUTC->format('H:i:s')
-        // );
-        // return $utcDate;
-
-
-        // return sprintf(
-        //     '%sT%s',
-        //     $this->owner->Format('yyyy-MM-dd'),
-        //     $this->owner->Format('HH:mm:ssZZZZZ')
-        // );
     }
 
 }

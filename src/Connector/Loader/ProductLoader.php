@@ -29,7 +29,7 @@ class ProductLoader extends Loader
         foreach ($ids as $id) {
             $mainCategory = ProductCategory::get()
                 ->filter('ExternalID', $id)
-                ->where('ProductCategoryID IS NOT NULL')->first();
+                ->where('ProductCategoryID != 0')->first();
             if ($mainCategory) {
                 return $id;
             }
@@ -69,11 +69,10 @@ class ProductLoader extends Loader
     {
         $ids = $data['categoryIdArray'];
         $mainCategoryID = $this->findMainCategoryID($ids);
-        // if ($this->isNew) {
+
         if ($mainCategoryID) {
             $product->ParentID = $this->findShopCategoryId($mainCategoryID);
         }
-        // }
 
         $currentCategoryIds = $product->ProductCategories()->map('ID', 'ID')->toArray();
         foreach ($ids as $id) {

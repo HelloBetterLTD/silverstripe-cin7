@@ -11,6 +11,7 @@ use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripers\Cin7\Extension\DatetimeExtension;
 use SilverStripers\Out\System\Log;
 
 class Cin7Connector
@@ -290,9 +291,9 @@ class Cin7Connector
     public function dateToCin7Date($date)
     {
         $dt = new \DateTime($date);
-        $cin7Date = $dt->format('Y-m-d\TH:i:s') . '+12:00';
+        $cin7Date = $dt->format('Y-m-d\TH:i:s') . DatetimeExtension::get_offset();
         return $cin7Date;
-        
+
         // $dt = strtotime($date);
         // return gmdate('Y-m-d\TH:i:s\Z', $dt);
     }
