@@ -242,8 +242,8 @@ class Cin7Connector
         $data = $member->toCin7();
         if ($member->ExternalID) {
             $response = $this->get(self::POST_CONTACTS . '/' . $member->ExternalID);
-            $member->Cin7Data = json_encode($response);
             if ($response) {
+                $member->Cin7Data = json_encode($response);
                 $map = [
                     'priceColumn' => 'PriceColumn',
                     'company' => 'Company',
@@ -255,6 +255,7 @@ class Cin7Connector
                         $member->setField($ssField, $response[$cin7Field]);
                     }
                 }
+                $member->LastSynced = DBDatetime::now()->getValue();
                 $member->invokeWithExtensions('updateCopyMember', $response);
                 $member->write();
             }

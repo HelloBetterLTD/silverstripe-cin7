@@ -16,7 +16,8 @@ class MemberExtension extends DataExtension
         'Mobile' => 'Varchar',
         'ExternalID' => 'Int',
         'PriceColumn' => 'Varchar',
-        'Cin7Data' => 'Text'
+        'Cin7Data' => 'Text',
+        'LastSynced' => 'Datetime'
     ];
 
     public function updateCMSFields(FieldList $fields)
