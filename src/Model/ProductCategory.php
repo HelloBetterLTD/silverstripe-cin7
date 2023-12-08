@@ -4,6 +4,7 @@ namespace SilverStripers\Cin7\Model;
 
 use SilverStripe\Forms\TreeDropdownField;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\Versioned\Versioned;
 use TractorCow\AutoComplete\AutoCompleteField;
 
 class ProductCategory extends DataObject
@@ -52,6 +53,27 @@ class ProductCategory extends DataObject
             )
         ], 'Description');
         return $fields;
+    }
+
+    public function createProductCategoryPage()
+    {
+        if ($this->ProductCategoryID == 0) {
+            $parentId = 0;
+            if (($parent = $this->Parent()) && $parent->exists()) {
+                $parentId = $parent->ProductCategoryID;
+            }
+            $page = \SilverShop\Page\ProductCategory::create([
+                'ParentID' => $parentId,
+                'Title' => $this->Title,
+                'Sort' => $this->Sort
+            ]);
+            $page->writeToStage(Versioned::DRAFT);
+
+            $this->ProductCategoryID = $page->ID;
+            $this->write();
+            return $page;
+        }
+        return $this->ProductCategory();
     }
 
     public function canCreate($member = null, $context = [])

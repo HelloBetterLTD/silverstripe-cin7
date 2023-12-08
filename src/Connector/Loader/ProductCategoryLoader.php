@@ -8,6 +8,8 @@ use SilverStripers\Cin7\Model\ProductCategory;
 class ProductCategoryLoader extends Loader
 {
 
+    private static $dynamic_categories = true;
+
     public function load($data)
     {
         $hash = $this->getHash($data);
@@ -34,7 +36,5 @@ class ProductCategoryLoader extends Loader
             $category->write();
         }
     }
-
-
 
 }
