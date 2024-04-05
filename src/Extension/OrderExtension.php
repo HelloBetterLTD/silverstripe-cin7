@@ -211,7 +211,7 @@ class OrderExtension extends DataExtension
             'discountDescription' => $this->getDiscountDescription(),
             'total' => $order->Total,
             'currencyCode' => 'NZD',
-            'currencyRate' => $order->Total,
+            'currencyRate' => 1,
             'currencySymbol' => '$',
             'taxStatus' => null,
             'taxRate' => 0, // TODO: tax

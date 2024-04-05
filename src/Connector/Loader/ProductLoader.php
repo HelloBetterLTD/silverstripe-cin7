@@ -122,6 +122,11 @@ class ProductLoader extends Loader
                     $product->publishRecursive();
                 }
             }
+
+            if ($force) {
+                $product->extend('onAfterForceLoad');
+            }
+
         } else if (self::config()->get('archive_others') && $product) {
             $product->doUnpublish();
             $product->doArchive();

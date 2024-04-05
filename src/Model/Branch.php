@@ -12,6 +12,7 @@ class Branch extends DataObject
         'Hash' => 'Text',
         'BranchType' => 'Varchar',
         'StockControlOptions' => 'Varchar',
+        'IsDefaultBranch' => 'Boolean',
         'IsActive' => 'Boolean',
         'Company' => 'Varchar',
         'Mobile' => 'Varchar',
