@@ -118,6 +118,7 @@ class ProductLoader extends Loader
                 $this->processVariations($data, $product);
                 $product->ExternalHash = $this->getHash($data);
                 $product->write();
+                $product->extend('onAfterCin7Load', $data);
                 if ($product->isPublished()) { // publish only previously published products
                     $product->publishRecursive();
                 }
