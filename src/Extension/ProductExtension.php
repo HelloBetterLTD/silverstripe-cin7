@@ -42,6 +42,10 @@ class ProductExtension extends DataExtension
         ]
     ];
 
+    private static $owns = [
+        'Images'
+    ];
+
     public function updateCMSFields(FieldList $fields) : void
     {
         $product = $this->owner;
