@@ -19,6 +19,8 @@ class ProductLoader extends Loader
 
     private static $archive_others = true;
 
+    private static $sync_secondary_categories = false;
+
     private function findProduct($data)
     {
         return Product::get()->find('ExternalID', $data['id']);
@@ -74,16 +76,18 @@ class ProductLoader extends Loader
             $product->ParentID = $this->findShopCategoryId($mainCategoryID);
         }
 
-        $currentCategoryIds = $product->ProductCategories()->map('ID', 'ID')->toArray();
-        foreach ($ids as $id) {
-            if (($shopId = $this->findShopCategoryId($id)) && $mainCategoryID != $shopId) {
-                $product->ProductCategories()->add($shopId);
-                unset($currentCategoryIds[$shopId]);
+        if (self::config()->get('sync_secondary_categories')) {
+            $currentCategoryIds = $product->ProductCategories()->map('ID', 'ID')->toArray();
+            foreach ($ids as $id) {
+                if (($shopId = $this->findShopCategoryId($id)) && $mainCategoryID != $shopId) {
+                    $product->ProductCategories()->add($shopId);
+                    unset($currentCategoryIds[$shopId]);
+                }
             }
-        }
 
-        foreach ($currentCategoryIds as $currentCategoryId) {
-            $product->ProductCategories()->removeByID($currentCategoryId);
+            foreach ($currentCategoryIds as $currentCategoryId) {
+                $product->ProductCategories()->removeByID($currentCategoryId);
+            }
         }
 
         return $product;
