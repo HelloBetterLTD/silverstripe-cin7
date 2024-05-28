@@ -29,6 +29,8 @@ class ImportProducts extends BuildTask
         /* @var $loader ProductLoader */
         $loader = Injector::inst()->get(ProductLoader::class);
 
+        $isForced = $config->ProductForcedImport;
+
         $run = true;
         $page = 1;
         while($run) {
@@ -37,7 +39,7 @@ class ImportProducts extends BuildTask
             Log::printLn('Recieved products : ' . count($products));
             foreach ($products as $product) {
                 Log::printLn('Checking product ' . $product['id']);
-                $loader->load($product);
+                $loader->load($product, $isForced);
             }
             $page += 1;
             sleep(self::config()->get('delay')); // obey the throttle
@@ -47,6 +49,7 @@ class ImportProducts extends BuildTask
         }
 
         $config->ProductLastImported = DBDatetime::now()->getValue();
+        $config->ProductForcedImport = false;
         $config->write();
     }
 

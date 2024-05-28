@@ -23,6 +23,7 @@ class Config extends DataExtension
         'DevAPIUsername' => 'Varchar',
         'DevAPIConnectionKey' => 'Varchar',
 
+        'ProductForcedImport' => 'Boolean',
         'ProductLastImported' => 'Datetime',
         'StockLastImported' => 'Datetime',
         'POLastImported' => 'Datetime',
