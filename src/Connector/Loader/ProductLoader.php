@@ -28,12 +28,14 @@ class ProductLoader extends Loader
 
     private function findMainCategoryID($ids)
     {
-        foreach ($ids as $id) {
-            $mainCategory = ProductCategory::get()
-                ->filter('ExternalID', $id)
-                ->where('ProductCategoryID != 0')->first();
-            if ($mainCategory) {
-                return $id;
+        if ($ids) {
+            foreach ($ids as $id) {
+                $mainCategory = ProductCategory::get()
+                    ->filter('ExternalID', $id)
+                    ->where('ProductCategoryID != 0')->first();
+                if ($mainCategory) {
+                    return $id;
+                }
             }
         }
         return 0;
