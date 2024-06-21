@@ -35,7 +35,13 @@ class OrderItemExtension extends DataExtension
             if ($member && $member->exists()) {
                 if ($col = $member->getAffectedPriceColumn()) {
                     $owner->MemberPriceColumn = $col;
-                    $matchedPriceOptions = $priceOptions->filter('Label', $col);
+                    $matchedPriceOptions = $priceOptions->where(
+                        sprintf(
+                            'LOWER(%s) = \'%s\'',
+                            'Label',
+                            strtolower($col)
+                        )
+                    )->first();
                 } else {
                     $groups = implode(',', array_merge([-1], $member->DirectGroups()->column('ID')));
                     $matchedPriceOptions = $priceOptions->where('(
