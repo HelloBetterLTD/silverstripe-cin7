@@ -41,7 +41,7 @@ class OrderItemExtension extends DataExtension
                             'Label',
                             strtolower($col)
                         )
-                    )->first();
+                    );
                 } else {
                     $groups = implode(',', array_merge([-1], $member->DirectGroups()->column('ID')));
                     $matchedPriceOptions = $priceOptions->where('(
