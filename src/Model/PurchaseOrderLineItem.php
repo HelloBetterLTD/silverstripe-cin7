@@ -15,7 +15,7 @@ class PurchaseOrderLineItem extends DataObject
     ];
 
     private static $has_one = [
-        'Product' => Product::class,
+        'Product' => DataObject::class,
         'Variation' => \SilverShop\Model\Variation\Variation::class,
         'PurchaseOrder' => PurchaseOrder::class
     ];
