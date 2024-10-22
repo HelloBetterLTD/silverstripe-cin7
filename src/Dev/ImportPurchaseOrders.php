@@ -3,13 +3,13 @@
 namespace SilverStripers\Cin7\Dev;
 
 use SilverShop\Model\Variation\Variation;
-use SilverShop\Page\Product;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
+use SilverStripers\Aurora\Model\Shop\Product;
 use SilverStripers\Cin7\Connector\Cin7Connector;
 use SilverStripers\Cin7\Connector\Loader\ProductLoader;
 use SilverStripers\Cin7\Extension\AttributeTypeExtension;
