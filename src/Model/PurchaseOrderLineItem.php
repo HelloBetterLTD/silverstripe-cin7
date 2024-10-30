@@ -2,7 +2,7 @@
 
 namespace SilverStripers\Cin7\Model;
 
-use SilverShop\Page\Product;
+use SilverStripers\Aurora\Model\Shop\Product;
 use SilverStripe\ORM\DataObject;
 
 class PurchaseOrderLineItem extends DataObject
@@ -15,7 +15,7 @@ class PurchaseOrderLineItem extends DataObject
     ];
 
     private static $has_one = [
-        'Product' => DataObject::class,
+        'Product' => Product::class,
         'Variation' => \SilverShop\Model\Variation\Variation::class,
         'PurchaseOrder' => PurchaseOrder::class
     ];

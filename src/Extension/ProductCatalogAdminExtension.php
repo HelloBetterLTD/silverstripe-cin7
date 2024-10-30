@@ -3,7 +3,7 @@
 
 namespace SilverStripers\Cin7\Extension;
 
-use SilverShop\Page\Product;
+use SilverStripers\Aurora\Model\Shop\Product;
 use SilverStripe\Core\Extension;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\GridField\GridField;

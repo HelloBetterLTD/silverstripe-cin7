@@ -3,7 +3,7 @@
 namespace SilverStripers\Cin7\Form\Field;
 
 use SilverShop\Model\Variation\Variation;
-use SilverShop\Page\Product;
+use SilverStripers\Aurora\Model\Shop\Product;
 use SilverStripe\Forms\FormField;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObjectInterface;

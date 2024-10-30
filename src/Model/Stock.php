@@ -2,8 +2,8 @@
 
 namespace SilverStripers\Cin7\Model;
 
-use SilverShop\Page\Product;
 use SilverStripe\ORM\DataObject;
+use SilverStripers\Aurora\Model\Shop\Product;
 
 class Stock extends DataObject
 {
@@ -15,7 +15,7 @@ class Stock extends DataObject
     ];
 
     private static $has_one = [
-        'Product' => DataObject::class,
+        'Product' => Product::class,
         'Variation' => \SilverShop\Model\Variation\Variation::class,
         'Branch' => Branch::class
     ];

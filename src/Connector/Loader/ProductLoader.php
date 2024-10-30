@@ -3,7 +3,7 @@
 namespace SilverStripers\Cin7\Connector\Loader;
 
 use SilverShop\Model\Variation\Variation;
-use SilverShop\Page\Product;
+use SilverStripers\Aurora\Model\Shop\Product;
 use SilverStripe\View\Parsers\URLSegmentFilter;
 use SilverStripers\Cin7\Extension\AttributeTypeExtension;
 use SilverStripers\Cin7\Extension\VariationExtension;

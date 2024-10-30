@@ -3,7 +3,7 @@
 namespace SilverStripers\Cin7\Model;
 
 use SilverShop\Model\Variation\Variation;
-use SilverShop\Page\Product;
+use SilverStripers\Aurora\Model\Shop\Product;
 use SilverStripe\ORM\DataObject;
 
 class Price extends DataObject
@@ -18,7 +18,7 @@ class Price extends DataObject
     ];
 
     private static $has_one = [
-        'Product' => DataObject::class,
+        'Product' => Product::class,
         'Variation' => Variation::class,
         'PriceOption' => PriceOption::class
     ];
