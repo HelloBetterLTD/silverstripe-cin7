@@ -30,6 +30,7 @@ class Cin7Connector
     const POST_CONTACTS = 'v1/Contacts';
     const PURCHASE_ORDERS = 'v1/PurchaseOrders';
     const GET_SALES_ORDERS = 'v1/SalesOrders';
+    const GET_CREDIT_NOTES = 'v1/CreditNotes';
 
     private static $conn;
 
@@ -43,7 +44,7 @@ class Cin7Connector
         $this->password = $password;
     }
 
-    public static function init() : Cin7Connector
+    public static function init(): Cin7Connector
     {
         if (!self::$conn) {
             $isDev = Director::isDev();
@@ -60,7 +61,7 @@ class Cin7Connector
         return self::$conn;
     }
 
-    public function getClient() : Client
+    public function getClient(): Client
     {
         if (!$this->client) {
             $this->client = new Client([
@@ -80,16 +81,16 @@ class Cin7Connector
     /**
      * @return array
      */
-    public function getProductCategories() : array
+    public function getProductCategories(): array
     {
         return $this->get(self::PRODUCT_CATEGORIES_ENDPOINT, ['rows' => 250]); // TODO: pagination
     }
 
-    public function getProducts($page = 1, $lastImported = null) : array
+    public function getProducts($page = 1, $lastImported = null): array
     {
         $params = [
             'rows' => 20,
-            'page' => $page ? : 1
+            'page' => $page ?: 1
         ];
         if ($lastImported) {
             $params['where'] = sprintf(
@@ -108,7 +109,7 @@ class Cin7Connector
     }
 
 
-    public function getBranches() : array
+    public function getBranches(): array
     {
         $config = SiteConfig::current_site_config();
         $response = $this->get(self::BRANCHES_ENDPOINT, [
@@ -118,7 +119,7 @@ class Cin7Connector
         return $response;
     }
 
-    public function get($path, $data = null) : array
+    public function get($path, $data = null): array
     {
         $params = [];
         if ($data) {
@@ -136,7 +137,7 @@ class Cin7Connector
         return [];
     }
 
-    public function post($path, $json) : array
+    public function post($path, $json): array
     {
         try {
             $response = $this->getClient()->request('POST', $path, [
@@ -153,7 +154,7 @@ class Cin7Connector
         return [];
     }
 
-    public function put($path, $json) : array
+    public function put($path, $json): array
     {
         try {
             $response = $this->getClient()->request('PUT', $path, [
@@ -167,14 +168,14 @@ class Cin7Connector
         return [];
     }
 
-    public function getStockForProduct($sku) : array
+    public function getStockForProduct($sku): array
     {
         return $this->get(self::STOCK_ENDPOINT, [
             'where' => "code='$sku'"
         ]);
     }
 
-    public function getStockForBranch($sku, $branchId) : int
+    public function getStockForBranch($sku, $branchId): int
     {
         $stocks = $this->getStockForProduct($sku);
         foreach ($stocks as $stock) {
@@ -291,11 +292,8 @@ class Cin7Connector
 
     public function dateToCin7Date($date)
     {
-//        $dt = new \DateTime($date);
-//        $cin7Date = $dt->format('Y-m-d\TH:i:s') . DatetimeExtension::get_offset();
-//        return $cin7Date;
-         $dt = strtotime($date);
-         return gmdate('Y-m-d\TH:i:s\Z', $dt);
+        $dt = strtotime($date);
+        return gmdate('Y-m-d\TH:i:s\Z', $dt);
     }
 
     public function getOrders($rows = 250, $page = 1, $date = null)
@@ -313,4 +311,88 @@ class Cin7Connector
         }
         return $this->get(self::GET_SALES_ORDERS, $params);
     }
+
+
+    public function getOrdersByMember($memberId = null, $date = null, $isSample = false)
+    {
+        $allOrders = [];
+        $page = 1;
+        $rows = 250;
+
+        do {
+            $params = [
+                'page' => $page,
+                'rows' => $rows,
+                'fields' => 'id, total, productTotal, reference, lineItems',
+            ];
+
+            $whereClauses = [
+                sprintf("memberId=%d", (int)$memberId),
+            ];
+
+            if (!empty($date)) {
+                $formattedDate = $this->dateToCin7Date($date);
+                $whereClauses[] = sprintf("modifiedDate>='%s'", $formattedDate);
+            }
+
+            if ($isSample) {
+                $whereClauses[] = sprintf("productTotal<=%s", 0.00);
+            }
+
+            $params['where'] = implode(' AND ', $whereClauses);
+
+            $response = $this->get(self::GET_SALES_ORDERS, $params);
+
+            if (empty($response) || !is_array($response)) {
+                break;
+            }
+
+            $allOrders = array_merge($allOrders, $response);
+
+            $page++;
+        } while (count($response) === $rows);
+
+        return $allOrders;
+    }
+
+    public function getCreditNotes($memberId = null, $date = null)
+    {
+        $allOrders = [];
+        $page = 1;
+        $rows = 250;
+
+        do {
+            $params = [
+                'page' => $page,
+                'rows' => $rows,
+                'fields' => 'id, isApproved, reference, memberId, total',
+            ];
+
+            $whereClauses = [
+                sprintf("memberId=%d", (int)$memberId),
+            ];
+
+            if (!empty($date)) {
+                $formattedDate = $this->dateToCin7Date($date);
+                $whereClauses[] = sprintf("modifiedDate>='%s'", $formattedDate);
+                $whereClauses[] = sprintf("isApproved=%s", 1);
+            }
+
+            $params['where'] = implode(' AND ', $whereClauses);
+
+            $response = $this->get(self::GET_CREDIT_NOTES, $params);
+
+            if (empty($response) || !is_array($response)) {
+                break;
+            }
+
+            $allOrders = array_merge($allOrders, $response);
+
+            $page++;
+        } while (count($response) === $rows);
+
+        return $allOrders;
+    }
+
+
 }

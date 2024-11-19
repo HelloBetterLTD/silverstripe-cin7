@@ -79,7 +79,7 @@ class OrderItemExtension extends DataExtension
                             break;
                         }
                     }
-                }die();
+                }
             } elseif ($defaultPrice) {
                 $priceItem = $buyable
                     ->Prices()
