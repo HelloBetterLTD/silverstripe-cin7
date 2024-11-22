@@ -360,26 +360,33 @@ class Cin7Connector
         $allOrders = [];
         $page = 1;
         $rows = 250;
+        $maxCallsPerSecond = 3;
+        $timeBetweenCalls = 1 / $maxCallsPerSecond;
 
         do {
             $params = [
                 'page' => $page,
                 'rows' => $rows,
-                'fields' => 'id, isApproved, reference, memberId, total',
+                'fields' => 'id, isApproved, reference, memberId, total, modifiedDate',
             ];
 
-            $whereClauses = [
-                sprintf("memberId=%d", (int)$memberId),
-            ];
+
+            if (!empty($memberId)) {
+                $whereClauses = [
+                    sprintf("memberId=%d", (int)$memberId),
+                ];
+            }
 
             if (!empty($date)) {
                 $formattedDate = $this->dateToCin7Date($date);
                 $whereClauses[] = sprintf("modifiedDate>='%s'", $formattedDate);
-                $whereClauses[] = sprintf("isApproved=%s", 1);
             }
+
+            $whereClauses[] = sprintf("isApproved=%s", 1);
 
             $params['where'] = implode(' AND ', $whereClauses);
 
+            $startTime = microtime(true);
             $response = $this->get(self::GET_CREDIT_NOTES, $params);
 
             if (empty($response) || !is_array($response)) {
@@ -388,11 +395,17 @@ class Cin7Connector
 
             $allOrders = array_merge($allOrders, $response);
 
+            $elapsedTime = microtime(true) - $startTime;
+            if ($elapsedTime < $timeBetweenCalls) {
+                usleep((int)(($timeBetweenCalls - $elapsedTime) * 1_000_000));
+            }
+
             $page++;
         } while (count($response) === $rows);
 
         return $allOrders;
     }
+
 
 
 }
