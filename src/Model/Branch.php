@@ -3,6 +3,7 @@
 namespace SilverStripers\Cin7\Model;
 
 use SilverStripe\ORM\DataObject;
+use SilverStripe\SiteConfig\SiteConfig;
 
 class Branch extends DataObject
 {
@@ -33,6 +34,10 @@ class Branch extends DataObject
         'PostalCountry' => 'Varchar'
     ];
 
+    private static $has_one = [
+        'Config' => SiteConfig::class
+    ];
+
     private static $summary_fields = [
         'Company',
         'IsActive' => ['title' => 'Active'],
@@ -51,7 +56,7 @@ class Branch extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->removeByName('Hash');
+        $fields->removeByName(['Hash', 'ConfigID']);
         return $fields;
     }
 
