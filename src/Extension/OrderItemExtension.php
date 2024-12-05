@@ -5,6 +5,7 @@ namespace SilverStripers\Cin7\Extension;
 use SilverShop\Model\Product\OrderItem;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Security\Security;
+use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripers\Cin7\Model\PriceOption;
 
 class OrderItemExtension extends DataExtension
@@ -30,7 +31,11 @@ class OrderItemExtension extends DataExtension
             }
 
             $defaultPrice = PriceOption::get_default();
-            $priceOptions = PriceOption::get();
+
+            $isAuSite = SiteConfig::current_site_config()->IsAuSite();
+            $priceOptions = PriceOption::get()->filter([
+                'IsAUPriceOption' => $isAuSite
+            ]);
             $matchedPriceOptions = null;
             if ($member && $member->exists()) {
                 if ($col = $member->getAffectedPriceColumn()) {

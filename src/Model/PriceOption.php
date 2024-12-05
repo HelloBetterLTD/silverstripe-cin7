@@ -7,6 +7,7 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\Security\Group;
+use SilverStripe\SiteConfig\SiteConfig;
 
 class PriceOption extends DataObject
 {
