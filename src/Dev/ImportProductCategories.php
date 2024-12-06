@@ -27,10 +27,9 @@ class ImportProductCategories extends BuildTask
             $loader->load($productCategory);
         }
 
-
-        if (ProductCategoryLoader::config()->get('dynamic_categories')) {
-            $this->createCategoryPages();
-        }
+//        if (ProductCategoryLoader::config()->get('dynamic_categories')) {
+//            $this->createCategoryPages();
+//        }
     }
 
     public function createCategoryPages($ids = [])
