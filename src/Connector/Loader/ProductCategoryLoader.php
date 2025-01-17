@@ -15,17 +15,16 @@ class ProductCategoryLoader extends Loader
     {
         $hash = $this->getHash($data);
 
-        $categoryRelation = ProductCategoryRelation::get()->find('Hash', $hash);
+        $categoryRelation = ProductCategoryRelation::get()->find('Title', $data['name']);
         if (!$categoryRelation) {
             $categoryRelation = ProductCategoryRelation::create();
+
+            $categoryRelation->update([
+                'Title' => $data['name']
+            ]);
+
+            $categoryRelation->write();
         }
-
-        $categoryRelation->update([
-            'Hash' => $hash,
-            'Title' => $data['name']
-        ]);
-
-        $categoryRelation->write();
 
 //        $category = ProductCategory::get()->find('ExternalID', $data['id']);
 //        if (!$category) {
