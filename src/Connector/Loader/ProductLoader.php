@@ -170,7 +170,9 @@ class ProductLoader extends Loader
             $product->VariationAttributeTypes()->add($sizeType);
         }
         foreach ($data['productOptions'] as $optionData) {
+            Log::printLn('Processing product variation ' . $optionData['id']);
             if (in_array($optionData['status'], [VariationExtension::PRIMARY, VariationExtension::ACTIVE])) {
+                Log::printLn('Starting to import product variation ' . $optionData['id']);
                 $variation = $this->importVariation($optionData, $product);
                 if ($variation) {
                     unset($variatonIDs[$variation->ID]);
@@ -257,17 +259,15 @@ class ProductLoader extends Loader
 
     private function findVariation($data, Product $product)
     {
-        return Variation::get()->filter([
-            'ProductID' => $product->ID,
-            'ExternalID' => $this->getVariationID($data)
-        ])->first();
+        return $product
+            ->Variations()
+            ->find('ExternalID', $this->getVariationID($data));
     }
 
 
     private function createVariation($data, Product $product)
     {
         $variation = Variation::create([
-            'ProductID' => $product->ID,
             'ExternalID' => $this->getVariationID($data)
         ]);
         if ($this->isNew) { // only import images to new
@@ -278,6 +278,7 @@ class ProductLoader extends Loader
             }
         }
         $variation->write();
+        $product->Variations()->add($variation);
         return $variation;
     }
 }
