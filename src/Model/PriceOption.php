@@ -55,17 +55,22 @@ class PriceOption extends DataObject
         return PriceOption::get()->find('Default', 1);
     }
 
-    public function validate() : ValidationResult
-    {
-        $valid = parent::validate();
-        if ($this->Default) {
-            $anyothers = PriceOption::get()->exclude('ID', $this->ID)->filter('Default', 1);
-            if ($anyothers->count()) {
-                $valid->addFieldError('Default', 'There is another price option marked as default');
-            }
-        }
-        return $valid;
-    }
+//    public function validate() : ValidationResult
+//    {
+//        $valid = parent::validate();
+//        if ($this->Default) {
+//
+//            if (SiteConfig::current_site_config()->IsAuSite()) {
+//                $anyothers = self::get()->filter('IsAUPriceOption', true)->exclude('ID', $this->ID)->filter('Default', 1);
+//            }else {
+//                $anyothers = self::get()->exclude('ID', $this->ID)->filter('Default', 1);
+//            }
+//            if ($anyothers->count()) {
+//                $valid->addFieldError('Default', 'There is another price option marked as default');
+//            }
+//        }
+//        return $valid;
+//    }
 
     public static function find_or_make($label)
     {
