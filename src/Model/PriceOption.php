@@ -52,25 +52,34 @@ class PriceOption extends DataObject
 
     public function getDefaultOption()
     {
-        return PriceOption::get()->find('Default', 1);
+        $isAusite = SiteConfig::current_site_config()->IsAuSite();
+        $priceOptions = PriceOption::get();
+        if ($isAusite) {
+            return $priceOptions->filter([
+                'IsAUPriceOption' => 1,
+                'Default' => 1
+            ])->first();
+        }
+
+        return $priceOptions->find('Default', 1);
     }
 
-//    public function validate() : ValidationResult
-//    {
-//        $valid = parent::validate();
-//        if ($this->Default) {
-//
-//            if (SiteConfig::current_site_config()->IsAuSite()) {
-//                $anyothers = self::get()->filter('IsAUPriceOption', true)->exclude('ID', $this->ID)->filter('Default', 1);
-//            }else {
-//                $anyothers = self::get()->exclude('ID', $this->ID)->filter('Default', 1);
-//            }
-//            if ($anyothers->count()) {
-//                $valid->addFieldError('Default', 'There is another price option marked as default');
-//            }
-//        }
-//        return $valid;
-//    }
+    public function validate() : ValidationResult
+    {
+        $valid = parent::validate();
+        if ($this->owner->Default) {
+
+            if ($this->owner->IsAUPriceOption) {
+                $anyothers = PriceOption::get()->filter('IsAUPriceOption', 1)->exclude('ID', $this->owner->ID)->filter('Default', 1);
+            }else {
+                $anyothers = PriceOption::get()->filter('IsAUPriceOption', 0)->exclude('ID', $this->owner->ID)->filter('Default', 1);
+            }
+            if ($anyothers->count()) {
+                $valid->addFieldError('Default', 'There is another price option marked as default');
+            }
+        }
+        return $valid;
+    }
 
     public static function find_or_make($label)
     {
