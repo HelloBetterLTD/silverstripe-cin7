@@ -158,6 +158,9 @@ class ProductLoader extends Loader
             'Cin7Categories' => !empty($data['categoryIdArray']) && is_array($data['categoryIdArray']) ?
                 implode(',', $data['categoryIdArray']) : $data['categoryIdArray'],
             'CustomFields' => json_encode(!empty($data['customFields']) ? $data['customFields'] : []),
+            'Sort' => !empty($data['customFields']['products_1005']) && is_numeric($data['customFields']['products_1005']) ?
+                $data['customFields']['products_1005'] : 0,
+            'SizeRangeID' => SizeRange::get()->find('RangeID', $data['sizeRangeId'])?->ID
         ]);
         $product->write();
     }

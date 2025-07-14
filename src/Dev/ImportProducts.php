@@ -43,7 +43,7 @@ class ImportProducts extends BuildTask
             }
             $page += 1;
             sleep(self::config()->get('delay')); // obey the throttle
-            if (count($products) < 20) {
+            if (count($products) < 250) {
                 $run = false;
             }
         }

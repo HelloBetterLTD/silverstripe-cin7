@@ -31,6 +31,7 @@ class Cin7Connector
     const PURCHASE_ORDERS = 'v1/PurchaseOrders';
     const GET_SALES_ORDERS = 'v1/SalesOrders';
     const GET_CREDIT_NOTES = 'v1/CreditNotes';
+    const SIZE_RANGES_ENDPOINT = 'v1/SizeRanges';
 
     private static $conn;
 
@@ -89,7 +90,7 @@ class Cin7Connector
     public function getProducts($page = 1, $lastImported = null): array
     {
         $params = [
-            'rows' => 20,
+            'rows' => 250,
             'page' => $page ?: 1
         ];
         if ($lastImported) {
@@ -107,8 +108,7 @@ class Cin7Connector
         $response = $this->get(self::PRODUCTS_ENDPOINT . '/' . $id, []);
         return $response;
     }
-
-
+    
     public function getBranches(): array
     {
         $config = SiteConfig::current_site_config();
@@ -117,6 +117,11 @@ class Cin7Connector
             'page' => 1
         ]);
         return $response;
+    }
+
+    public function getSizeRanges(): array
+    {
+        return $this->get(self::SIZE_RANGES_ENDPOINT);
     }
 
     public function get($path, $data = null): array
