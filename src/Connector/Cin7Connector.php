@@ -108,7 +108,7 @@ class Cin7Connector
         $response = $this->get(self::PRODUCTS_ENDPOINT . '/' . $id, []);
         return $response;
     }
-    
+
     public function getBranches(): array
     {
         $config = SiteConfig::current_site_config();
@@ -328,7 +328,7 @@ class Cin7Connector
             $params = [
                 'page' => $page,
                 'rows' => $rows,
-                'fields' => 'id, total, productTotal, reference, lineItems',
+                'fields' => 'id, invoiceNumber, modifiedDate, status, total, productTotal, reference, lineItems',
             ];
 
             $whereClauses = [
