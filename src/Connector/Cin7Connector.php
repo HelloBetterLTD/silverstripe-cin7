@@ -12,6 +12,7 @@ use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripers\Cin7\Extension\DatetimeExtension;
+use SilverStripers\Cin7\Helper\Cin7FileLogger;
 use SilverStripers\Out\System\Log;
 
 class Cin7Connector
@@ -19,6 +20,9 @@ class Cin7Connector
 
     use Configurable;
     use Injectable;
+
+    /** @var Cin7FileLogger */
+    private $logger;
 
     const API_BASE = 'https://api.cin7.com/api/';
 
@@ -43,6 +47,8 @@ class Cin7Connector
     {
         $this->username = $username;
         $this->password = $password;
+
+        $this->logger = new Cin7FileLogger();
     }
 
     public static function init(): Cin7Connector
@@ -126,6 +132,8 @@ class Cin7Connector
 
     public function get($path, $data = null): array
     {
+        $this->logger->logCall('GET', $path);
+
         $params = [];
         if ($data) {
             $params = [
@@ -144,6 +152,8 @@ class Cin7Connector
 
     public function post($path, $json): array
     {
+        $this->logger->logCall('POST', $path);
+
         try {
             $response = $this->getClient()->request('POST', $path, [
                 'body' => $json,
@@ -161,6 +171,8 @@ class Cin7Connector
 
     public function put($path, $json): array
     {
+        $this->logger->logCall('PUT', $path);
+
         try {
             $response = $this->getClient()->request('PUT', $path, [
                 'body' => $json
