@@ -21,7 +21,7 @@ class Cin7FileLogger
         }
     }
 
-    public function logCall(string $method = null, string $endpoint = null)
+    public function logCall(string $method = null, string $endpoint = null, bool $success = true)
     {
         $endpoint = explode('?', $endpoint)[0];
         $logs = $this->readLogs();
@@ -36,12 +36,21 @@ class Cin7FileLogger
         if (!isset($logs[$today][$key])) {
             $logs[$today][$key] = [
                 'count' => 0,
+                'success' => 0,
+                'failed' => 0,
                 'last_called' => null,
             ];
         }
 
         $logs[$today][$key]['count'] += 1;
         $logs[$today][$key]['last_called'] = date('Y-m-d H:i:s');
+
+        if ($success) {
+            $logs[$today][$key]['success'] += 1;
+        } else {
+            $logs[$today][$key]['failed'] += 1;
+        }
+
         $this->writeLogs($logs);
     }
 

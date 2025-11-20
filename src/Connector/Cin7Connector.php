@@ -132,8 +132,6 @@ class Cin7Connector
 
     public function get($path, $data = null): array
     {
-        $this->logger->logCall('GET', $path);
-
         $params = [];
         if ($data) {
             $params = [
@@ -143,8 +141,13 @@ class Cin7Connector
         try {
             $response = $this->getClient()->get($path, $params);
             $json = $response->getBody()->getContents();
+
+            $this->logger->logCall('GET', $path, true);
+
             return json_decode($json, true);
         } catch (\Exception $e) {
+
+            $this->logger->logCall('GET', $path, false);
             Log::printLn($e->getMessage());
         }
         return [];
@@ -152,8 +155,6 @@ class Cin7Connector
 
     public function post($path, $json): array
     {
-        $this->logger->logCall('POST', $path);
-
         try {
             $response = $this->getClient()->request('POST', $path, [
                 'body' => $json,
@@ -162,8 +163,13 @@ class Cin7Connector
                 ]
             ]);
             $json = $response->getBody()->getContents();
+
+            $this->logger->logCall('POST', $path, true);
+
             return json_decode($json, true);
         } catch (\Exception $e) {
+
+            $this->logger->logCall('POST', $path, false);
             Log::printLn($e->getMessage());
         }
         return [];
@@ -171,15 +177,18 @@ class Cin7Connector
 
     public function put($path, $json): array
     {
-        $this->logger->logCall('PUT', $path);
 
         try {
             $response = $this->getClient()->request('PUT', $path, [
                 'body' => $json
             ]);
             $json = $response->getBody()->getContents();
+
+            $this->logger->logCall('PUT', $path, true);
             return json_decode($json, true);
         } catch (\Exception $e) {
+
+            $this->logger->logCall('PUT', $path, false);
             Log::printLn($e->getMessage());
         }
         return [];
