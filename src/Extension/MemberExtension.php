@@ -5,6 +5,7 @@ namespace SilverStripers\Cin7\Extension;
 
 use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripers\Cin7\Connector\Cin7Connector;
 
 class MemberExtension extends DataExtension
@@ -64,7 +65,16 @@ class MemberExtension extends DataExtension
     public function afterMemberLoggedIn()
     {
         try {
-            $this->syncFromCin7();
+            if ($account = $this->owner->getAccount()) {
+
+                $lastChecked = $account->PriceColumnLastChecked;
+                if ($lastChecked && strtotime($lastChecked) > strtotime('-1 day')) {
+                    return;
+                }
+
+                $this->syncFromCin7();
+
+            }
         } catch (\Exception $e) {}
     }
 
